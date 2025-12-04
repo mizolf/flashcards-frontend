@@ -1,1 +1,157 @@
-<p>login works!</p>
+<div class="login-container">
+  <div class="login-card">
+    <h1 class="title">Stvorite novi račun</h1>
+
+    <div class="tabs">
+      <button
+        class="tab"
+        [class.active]="!isLoginMode"
+        (click)="toggleMode('register')"
+        type="button">
+        Registracija
+      </button>
+      <button
+        class="tab"
+        [class.active]="isLoginMode"
+        (click)="toggleMode('login')"
+        type="button">
+        Prijava
+      </button>
+    </div>
+
+    <!-- Login forma -->
+    @if (isLoginMode && !showVerification) {
+        <form class="form">
+          <div class="field">
+            <label for="login-email">E-mail adresa</label>
+            <input
+              pInputText
+              id="login-email"
+              type="email"
+              placeholder="Unesite vašu e-mail adresu"
+              class="input-field" />
+          </div>
+    
+          <div class="field">
+            <label for="login-password">Lozinka</label>
+            <p-password [(ngModel)]="value" [toggleMask]="true" />
+          </div>
+    
+          <a href="#" class="forgot-link">Zaboravljena lozinka?</a>
+    
+          <button
+            pButton
+            type="submit"
+            label="Prijavi se"
+            class="submit-btn"
+            [loading]="false">
+          </button>
+    
+          <div class="divider">
+            <span>Ili se prijavite putem</span>
+          </div>
+    
+          <div class="social-buttons">
+            <button type="button" class="social-btn google">
+              <i class="pi pi-google"></i>
+            </button>
+            <button type="button" class="social-btn facebook">
+              <i class="pi pi-facebook"></i>
+            </button>
+          </div>
+        </form>
+    }
+
+    <!-- Register forma -->
+    @if (!isLoginMode && !showVerification) {
+        <form class="form">
+          <div class="field">
+            <label for="register-username">Korisničko ime</label>
+            <input
+              pInputText
+              id="register-username"
+              type="text"
+              placeholder="Unesite korisničko ime"
+              class="input-field" />
+          </div>
+    
+          <div class="field">
+            <label for="register-email">E-mail adresa</label>
+            <input
+              pInputText
+              id="register-email"
+              type="email"
+              placeholder="Unesite vašu e-mail adresu"
+              class="input-field" />
+          </div>
+    
+          <div class="field">
+            <label for="register-password">Lozinka</label>
+            <p-password [(ngModel)]="value" [toggleMask]="true" />
+          </div>
+    
+          <div class="field">
+            <label for="confirm-password">Potvrdite lozinku</label>
+            <p-password
+              id="confirm-password"
+              placeholder="Potvrdite vašu lozinku"
+              [toggleMask]="true"
+              [feedback]="false"
+              styleClass="password-input">
+            </p-password>
+          </div>
+    
+          <button
+            pButton
+            type="submit"
+            label="Registriraj se"
+            class="submit-btn"
+            [loading]="false">
+          </button>
+    
+          <div class="divider">
+            <span>Ili se prijavite putem</span>
+          </div>
+    
+          <div class="social-buttons">
+            <button type="button" class="social-btn google">
+              <i class="pi pi-google"></i>
+            </button>
+            <button type="button" class="social-btn facebook">
+              <i class="pi pi-facebook"></i>
+            </button>
+          </div>
+        </form>
+    }
+
+    @if (showVerification) {
+        <form class="form">
+          <div class="field">
+            <label for="verification-code">Verifikacijski kod</label>
+            <input
+              pInputText
+              id="verification-code"
+              type="text"
+              placeholder="Unesite 6-cifreni kod"
+              class="input-field verification-input"
+              maxlength="6" />
+          </div>
+    
+          <button
+            pButton
+            type="submit"
+            label="Potvrdi"
+            class="submit-btn"
+            [loading]="false">
+          </button>
+    
+          <div class="text-center mt-3">
+            <p class="resend-text">
+              Niste primili kod?
+              <a href="#" class="resend-link">Pošalji ponovo</a>
+            </p>
+          </div>
+        </form>
+    }
+  </div>
+</div>
