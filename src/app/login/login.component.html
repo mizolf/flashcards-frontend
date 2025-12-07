@@ -1,22 +1,20 @@
 <div class="login-container">
   <div class="login-card">
-    <h1 class="title">Stvorite novi račun</h1>
+    @if (isLoginMode) {
+      <h1 class="title">Prijavite se na vaš račun</h1>
+    }
+    @else {
+      <h1 class="title">Stvorite novi račun</h1>
+    }
 
-    <div class="tabs">
-      <button
-        class="tab"
-        [class.active]="!isLoginMode"
-        (click)="toggleMode('register')"
-        type="button">
-        Registracija
-      </button>
-      <button
-        class="tab"
-        [class.active]="isLoginMode"
-        (click)="toggleMode('login')"
-        type="button">
-        Prijava
-      </button>
+    <div class="flex justify-center items-center w-full mb-4">
+      <p-selectbutton
+        [options]="modeOptions"
+        [(ngModel)]="selectedMode"
+        (ngModelChange)="onModeChange()"
+        optionLabel="label"
+        optionValue="value"
+        aria-labelledby="mode-selector" />
     </div>
 
     <!-- Login forma -->
@@ -31,10 +29,10 @@
               placeholder="Unesite vašu e-mail adresu"
               class="input-field" />
           </div>
-    
+        
           <div class="field">
             <label for="login-password">Lozinka</label>
-            <p-password [(ngModel)]="value" [toggleMask]="true" />
+            <p-password [(ngModel)]="value" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Unesite vašu lozinku" />
           </div>
     
           <a href="#" class="forgot-link">Zaboravljena lozinka?</a>
@@ -87,7 +85,7 @@
     
           <div class="field">
             <label for="register-password">Lozinka</label>
-            <p-password [(ngModel)]="value" [toggleMask]="true" />
+            <p-password [(ngModel)]="value" feedback="false" [toggleMask]="true" placeholder="Unesite vašu lozinku" styleClass="password-input" />
           </div>
     
           <div class="field">
