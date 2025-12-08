@@ -19,7 +19,7 @@
 
     <!-- Login forma -->
     @if (isLoginMode && !showVerification) {
-        <form class="form">
+        <form [formGroup]="loginForm" class="form" >
           <div class="field">
             <label for="login-email">E-mail adresa</label>
             <input
@@ -27,12 +27,13 @@
               id="login-email"
               type="email"
               placeholder="Unesite vašu e-mail adresu"
-              class="input-field" />
+              class="input-field"
+              formControlName="email" />
           </div>
         
           <div class="field">
             <label for="login-password">Lozinka</label>
-            <p-password [(ngModel)]="value" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Unesite vašu lozinku" />
+            <p-password formControlName="password" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Unesite vašu lozinku" />
           </div>
     
           <a href="#" class="forgot-link">Zaboravljena lozinka?</a>
@@ -42,8 +43,14 @@
             type="submit"
             label="Prijavi se"
             class="submit-btn"
-            [loading]="false">
+            [loading]="loading"
+            [disabled]="loginForm.invalid"
+            (click)="login()">
           </button>
+
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <small class="error">Unesite valjanu e-mail adresu</small>
+          }
     
           <div class="divider">
             <span>Ili se prijavite putem</span>
@@ -62,7 +69,7 @@
 
     <!-- Register forma -->
     @if (!isLoginMode && !showVerification) {
-        <form class="form">
+        <form [formGroup]="registerForm" class="form" >
           <div class="field">
             <label for="register-username">Korisničko ime</label>
             <input
@@ -70,7 +77,8 @@
               id="register-username"
               type="text"
               placeholder="Unesite korisničko ime"
-              class="input-field" />
+              class="input-field"
+              formControlName="username" />
           </div>
     
           <div class="field">
@@ -80,12 +88,13 @@
               id="register-email"
               type="email"
               placeholder="Unesite vašu e-mail adresu"
-              class="input-field" />
+              class="input-field"
+              formControlName="email" />
           </div>
     
           <div class="field">
             <label for="register-password">Lozinka</label>
-            <p-password [(ngModel)]="value" feedback="false" [toggleMask]="true" placeholder="Unesite vašu lozinku" styleClass="password-input" />
+            <p-password formControlName="password" feedback="false" [toggleMask]="true" placeholder="Unesite vašu lozinku" styleClass="password-input" />
           </div>
     
           <div class="field">
@@ -95,7 +104,8 @@
               placeholder="Potvrdite vašu lozinku"
               [toggleMask]="true"
               [feedback]="false"
-              styleClass="password-input">
+              styleClass="password-input"
+              formControlName="confirmPassword">
             </p-password>
           </div>
     
@@ -104,7 +114,9 @@
             type="submit"
             label="Registriraj se"
             class="submit-btn"
-            [loading]="false">
+            [loading]="loading"
+            [disabled]="registerForm.invalid"
+            (click)="register()">
           </button>
     
           <div class="divider">
