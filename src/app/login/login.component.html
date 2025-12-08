@@ -23,14 +23,18 @@
           <div class="field">
             <label for="login-email">E-mail adresa</label>
             <input
-              pInputText
-              id="login-email"
-              type="email"
-              placeholder="Unesite vašu e-mail adresu"
-              class="input-field"
-              formControlName="email" />
+            pInputText
+            id="login-email"
+            type="email"
+            placeholder="Unesite vašu e-mail adresu"
+            class="input-field"
+            formControlName="email" />
           </div>
-        
+          
+          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+            <small class="error">Unesite valjanu e-mail adresu</small>
+          }
+          
           <div class="field">
             <label for="login-password">Lozinka</label>
             <p-password formControlName="password" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Unesite vašu lozinku" />
@@ -48,9 +52,6 @@
             (click)="login()">
           </button>
 
-          @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-            <small class="error">Unesite valjanu e-mail adresu</small>
-          }
     
           <div class="divider">
             <span>Ili se prijavite putem</span>
@@ -134,34 +135,42 @@
         </form>
     }
 
-    @if (showVerification) {
-        <form class="form">
-          <div class="field">
-            <label for="verification-code">Verifikacijski kod</label>
-            <input
-              pInputText
-              id="verification-code"
-              type="text"
-              placeholder="Unesite 6-cifreni kod"
-              class="input-field verification-input"
-              maxlength="6" />
-          </div>
-    
-          <button
-            pButton
-            type="submit"
-            label="Potvrdi"
-            class="submit-btn"
-            [loading]="false">
-          </button>
-    
-          <div class="text-center mt-3">
-            <p class="resend-text">
-              Niste primili kod?
-              <a href="#" class="resend-link">Pošalji ponovo</a>
-            </p>
-          </div>
-        </form>
-    }
+    <p-dialog 
+      header="Verifikacija e-maila" 
+      [(visible)]="showVerification" 
+      [modal]="true"
+      [closable]="true"
+      [style]="{ width: '400px' }">
+      
+      <p class="mb-4">Poslali smo verifikacijski kod na {{ verificationEmail }}</p>
+      
+      <div class="field">
+        <label for="verification-code">Verifikacijski kod</label>
+        <input
+          pInputText
+          id="verification-code"
+          type="text"
+          placeholder="Unesite 6-cifreni kod"
+          class="input-field"
+          [(ngModel)]="verificationCode"
+          maxlength="6" />
+      </div>
+
+      <button
+        pButton
+        type="button"
+        label="Potvrdi"
+        class="submit-btn"
+        [disabled]="verificationCode.length !== 6"
+        (click)="verify()">
+      </button>
+
+      <div class="text-center mt-3">
+        <p class="resend-text">
+          Niste primili kod?
+          <a (click)="resendCode()" class="resend-link cursor-pointer">Pošalji ponovo</a>
+        </p>
+      </div>
+    </p-dialog>
   </div>
 </div>

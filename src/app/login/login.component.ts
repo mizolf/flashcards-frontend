@@ -4,12 +4,14 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { PasswordModule } from 'primeng/password';
 import { SelectButtonModule } from 'primeng/selectbutton';
+import { DialogModule } from 'primeng/dialog';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule  } from '@angular/forms';
 
 import { LoginUserDTO } from '../models/LoginUserDTO.dto';
 import { AuthenticationService } from '../services/authentication.service';
 import { Router } from '@angular/router';
 import { RegisterUserDTO } from '../models/RegisterUserDTO.dto';
+import { VerifiedUserDTO } from '../models/VerifiedUserDTO.dto';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +23,8 @@ import { RegisterUserDTO } from '../models/RegisterUserDTO.dto';
     PasswordModule,
     SelectButtonModule,
     FormsModule,
-    ReactiveFormsModule 
+    ReactiveFormsModule,
+    DialogModule
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss'
@@ -30,6 +33,8 @@ export class LoginComponent {
   isLoginMode = true;
   showVerification = false;
   loading: boolean = false;
+  verificationCode: string = '';
+  verificationEmail: string = '';
 
   modeOptions = [
     { label: 'Registracija', value: 'register' },
@@ -85,6 +90,8 @@ export class LoginComponent {
     this.authService.signup(request).subscribe({
       next: (response) => {
         this.loading = false;
+        this.verificationEmail = this.registerForm.value.email;
+        this.showVerification = true;
       },
       error: (err) => {
         this.loading = false;
@@ -114,6 +121,36 @@ export class LoginComponent {
         this.loading = false;
         console.error('Invalid username or password. Please try again.', err);
       },
+    });
+  }
+
+  public verify(): void {
+    const request: VerifiedUserDTO = {
+      email: this.verificationEmail,
+      verificationCode: this.verificationCode
+    };
+    
+    this.authService.verify(request).subscribe({
+      next: () => {
+        this.showVerification = false;
+        this.selectedMode = 'login';
+        this.isLoginMode = true;
+
+      },
+      error: (err) => {
+        console.error('Verification failed', err);
+      }
+    });
+  }
+
+  public resendCode(): void {
+    this.authService.resendVerificationCode(this.verificationEmail).subscribe({
+      next: () => {
+        console.log('Verification code resent successfully');
+      },
+      error: (err) => {
+        console.error('Resend failed', err);
+      }
     });
   }
 }
