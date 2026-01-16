@@ -7,11 +7,11 @@ import { SelectButtonModule } from 'primeng/selectbutton';
 import { DialogModule } from 'primeng/dialog';
 import { FormControl, FormGroup, FormsModule, Validators, ReactiveFormsModule  } from '@angular/forms';
 
-import { LoginUserDTO } from '../models/LoginUserDTO.dto';
-import { AuthenticationService } from '../services/authentication.service';
+import { LoginUserDTO } from '../../models/LoginUserDTO.dto';
+import { AuthenticationService } from '../../services/authentication.service';
 import { Router } from '@angular/router';
-import { RegisterUserDTO } from '../models/RegisterUserDTO.dto';
-import { VerifiedUserDTO } from '../models/VerifiedUserDTO.dto';
+import { RegisterUserDTO } from '../../models/RegisterUserDTO.dto';
+import { VerifiedUserDTO } from '../../models/VerifiedUserDTO.dto';
 
 @Component({
   selector: 'app-login',
