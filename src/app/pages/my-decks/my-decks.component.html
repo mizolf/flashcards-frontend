@@ -1,1 +1,27 @@
-<p>my-decks works!</p>
+<div class="my-decks-actions">
+  <button
+    pButton
+    type="button"
+    label="Novi deck"
+    icon="pi pi-plus"
+    (click)="openCreateDialog()"
+  ></button>
+</div>
+
+<div class="my-decks-list" *ngIf="!loading">
+  <div class="my-decks-item" *ngFor="let deck of decks">
+    <div class="my-decks-name">{{ deck.name }}</div>
+    <div class="my-decks-meta">
+      {{ deck.cardCount }} cards · {{ deck.isPublic ? 'Public' : 'Private' }}
+    </div>
+  </div>
+</div>
+
+<div class="my-decks-loading" *ngIf="loading">
+  Ucitavanje...
+</div>
+
+<app-deck-form-dialog
+  [(visible)]="showCreateDialog"
+  (save)="createDeck($event)"
+></app-deck-form-dialog>

@@ -1,1 +1,33 @@
-<p>deck-form-dialog works!</p>
+<p-dialog
+  header="Novi deck"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="visible"
+  (onHide)="close()"
+>
+  <div class="deck-form">
+    <label for="deck-name">Naziv</label>
+    <input
+      pInputText
+      id="deck-name"
+      name="deckName"
+      placeholder="Unesi naziv decka"
+      [(ngModel)]="name"
+    />
+
+    <div class="deck-form__public">
+      <p-checkbox
+        inputId="deck-public"
+        [binary]="true"
+        [(ngModel)]="isPublic"
+      ></p-checkbox>
+      <label for="deck-public">Javan deck</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" class="p-button-text" label="Odustani" (click)="close()"></button>
+    <button pButton type="button" label="Spremi" [disabled]="!name.trim()" (click)="submit()"></button>
+  </ng-template>
+</p-dialog>
