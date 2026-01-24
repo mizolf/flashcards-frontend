@@ -1,27 +1,163 @@
-<div class="my-decks-actions">
-  <button
-    pButton
-    type="button"
-    label="Novi deck"
-    icon="pi pi-plus"
-    (click)="openCreateDialog()"
-  ></button>
-</div>
-
-<div class="my-decks-list" *ngIf="!loading">
-  <div class="my-decks-item" *ngFor="let deck of decks">
-    <div class="my-decks-name">{{ deck.name }}</div>
-    <div class="my-decks-meta">
-      {{ deck.cardCount }} cards · {{ deck.isPublic ? 'Public' : 'Private' }}
+<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text" (click)="closeMenu()">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">Workspace</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">My Decks</h1>
+      <p class="mt-1 text-sm text-text-muted">Organize public decks and your private study sets.</p>
     </div>
+    <button
+      pButton
+      type="button"
+      label="Novi deck"
+      icon="pi pi-plus"
+      (click)="openCreateDialog(); $event.stopPropagation()"
+    ></button>
   </div>
-</div>
 
-<div class="my-decks-loading" *ngIf="loading">
-  Ucitavanje...
-</div>
+  <div class="mt-8 space-y-10" *ngIf="!loading">
+    <section>
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text">Public decks</h2>
+          <p class="text-xs text-text-muted">Visible to everyone.</p>
+        </div>
+        <span class="text-sm text-text-muted">{{ publicDecks.length }} total</span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="relative" *ngFor="let deck of publicDecks; let i = index">
+          <div
+            class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
+            (click)="openDeck(deck)"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br opacity-90"
+              [ngClass]="getDeckGradient(deck, i)"
+            ></div>
+            <div class="relative flex h-full flex-col gap-5 p-5">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="text-lg font-semibold leading-snug">{{ deck.name }}</h3>
+                <button
+                  class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide"
+                  type="button"
+                  (click)="toggleMenu(deck.id, $event)"
+                >
+                  ...
+                </button>
+              </div>
+              <p class="text-sm text-white/90">{{ deck.cardCount }} cards</p>
+              <div class="mt-auto flex items-center gap-2">
+                <span class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide">Public</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="absolute right-0 top-12 z-20 w-40 rounded-xl border border-border bg-surface-card p-2 text-sm text-text shadow-card"
+            *ngIf="openMenuDeckId === deck.id"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              class="w-full rounded-lg px-3 py-2 text-left text-text hover:bg-surface-soft"
+              type="button"
+              (click)="openManageDeck(deck, $event)"
+            >
+              Edit deck
+            </button>
+            <button
+              class="w-full rounded-lg px-3 py-2 text-left text-rose-600 hover:bg-rose-50"
+              type="button"
+              (click)="deleteDeck(deck, $event)"
+            >
+              Delete deck
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
+          *ngIf="publicDecks.length === 0"
+        >
+          No public decks yet.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text">Private decks</h2>
+          <p class="text-xs text-text-muted">Only visible to you.</p>
+        </div>
+        <span class="text-sm text-text-muted">{{ privateDecks.length }} total</span>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="relative" *ngFor="let deck of privateDecks; let i = index">
+          <div
+            class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
+            (click)="openDeck(deck)"
+          >
+            <div
+              class="absolute inset-0 bg-gradient-to-br opacity-90"
+              [ngClass]="getDeckGradient(deck, i)"
+            ></div>
+            <div class="relative flex h-full flex-col gap-5 p-5">
+              <div class="flex items-start justify-between gap-3">
+                <h3 class="text-lg font-semibold leading-snug">{{ deck.name }}</h3>
+                <button
+                  class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide"
+                  type="button"
+                  (click)="toggleMenu(deck.id, $event)"
+                >
+                  ...
+                </button>
+              </div>
+              <p class="text-sm text-white/90">{{ deck.cardCount }} cards</p>
+              <div class="mt-auto flex items-center gap-2">
+                <span class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide">Private</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="absolute right-0 top-12 z-20 w-40 rounded-xl border border-border bg-surface-card p-2 text-sm text-text shadow-card"
+            *ngIf="openMenuDeckId === deck.id"
+            (click)="$event.stopPropagation()"
+          >
+            <button
+              class="w-full rounded-lg px-3 py-2 text-left text-text hover:bg-surface-soft"
+              type="button"
+              (click)="openManageDeck(deck, $event)"
+            >
+              Edit deck
+            </button>
+            <button
+              class="w-full rounded-lg px-3 py-2 text-left text-rose-600 hover:bg-rose-50"
+              type="button"
+              (click)="deleteDeck(deck, $event)"
+            >
+              Delete deck
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
+          *ngIf="privateDecks.length === 0"
+        >
+          No private decks yet.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="mt-6 text-text-muted" *ngIf="loading">
+    Loading...
+  </div>
+</section>
 
 <app-deck-form-dialog
   [(visible)]="showCreateDialog"
-  (save)="createDeck($event)"
+  (save)="createOrUpdateDeck($event)"
 ></app-deck-form-dialog>

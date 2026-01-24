@@ -1,33 +1,39 @@
 <p-dialog
-  header="Novi deck"
+  [header]="deck ? 'Edit deck' : 'New deck'"
   [modal]="true"
   [draggable]="false"
   [resizable]="false"
   [(visible)]="visible"
   (onHide)="close()"
+  styleClass="rounded-2xl"
 >
-  <div class="deck-form">
-    <label for="deck-name">Naziv</label>
-    <input
-      pInputText
-      id="deck-name"
-      name="deckName"
-      placeholder="Unesi naziv decka"
-      [(ngModel)]="name"
-    />
+  <div class="flex flex-col gap-4 text-slate-800">
+    <div class="flex flex-col gap-2">
+      <label for="deck-name" class="text-sm font-medium text-slate-700">Name</label>
+      <input
+        pInputText
+        id="deck-name"
+        name="deckName"
+        placeholder="Enter deck name"
+        [(ngModel)]="name"
+        class="w-full"
+      />
+    </div>
 
-    <div class="deck-form__public">
+    <div class="flex items-center gap-2">
       <p-checkbox
         inputId="deck-public"
         [binary]="true"
         [(ngModel)]="isPublic"
       ></p-checkbox>
-      <label for="deck-public">Javan deck</label>
+      <label for="deck-public" class="text-sm text-slate-600">Public deck</label>
     </div>
   </div>
 
   <ng-template pTemplate="footer">
-    <button pButton type="button" class="p-button-text" label="Odustani" (click)="close()"></button>
-    <button pButton type="button" label="Spremi" [disabled]="!name.trim()" (click)="submit()"></button>
+    <div class="flex items-center justify-end gap-2">
+      <button pButton type="button" class="p-button-text" label="Cancel" (click)="close()"></button>
+      <button pButton type="button" label="Save" [disabled]="!name.trim()" (click)="submit()"></button>
+    </div>
   </ng-template>
 </p-dialog>

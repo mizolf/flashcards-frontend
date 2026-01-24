@@ -1,1 +1,119 @@
-<p>deck-detail works!</p>
+<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text" *ngIf="!loading && deck">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <button
+        class="text-xs uppercase tracking-[0.3em] text-text-muted"
+        type="button"
+        (click)="goBack()"
+      >
+        Back
+      </button>
+      <h1 class="mt-2 text-3xl font-semibold text-text">Manage deck</h1>
+      <p class="mt-1 text-sm text-text-muted">
+        {{ deck.cardCount }} cards | {{ deck.ownerUsername }}
+      </p>
+    </div>
+    <button
+      pButton
+      type="button"
+      label="New card"
+      icon="pi pi-plus"
+      (click)="openCardDialog()"
+    ></button>
+  </div>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1.95fr]">
+    <div class="surface-panel p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text">Deck details</h2>
+          <p class="mt-1 text-sm text-text-muted">Edit deck info and keep cards updated.</p>
+        </div>
+        <span class="rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
+          Settings
+        </span>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <label for="deck-name" class="text-sm font-medium text-text">Name</label>
+          <input
+            pInputText
+            id="deck-name"
+            name="deckName"
+            placeholder="Deck name"
+            [(ngModel)]="deckName"
+            class="w-full"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <p-checkbox inputId="deck-public" [binary]="true" [(ngModel)]="deckIsPublic"></p-checkbox>
+          <label for="deck-public" class="text-sm text-text-muted">Public deck</label>
+        </div>
+
+        <button
+          class="btn-primary disabled:opacity-60"
+          type="button"
+          [disabled]="saving || !deckName.trim()"
+          (click)="saveDeck()"
+        >
+          {{ saving ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div
+          class="surface-card p-5 transition hover:-translate-y-0.5 hover:shadow-cardHover"
+          *ngFor="let card of cards"
+        >
+          <div class="flex items-start justify-between gap-3">
+            <h3 class="text-lg font-semibold text-text">{{ card.question }}</h3>
+            <span class="rounded-full bg-surface-soft px-2 py-1 text-xs text-text-muted">
+              {{ card.tag || 'General' }}
+            </span>
+          </div>
+          <p class="mt-3 text-sm text-text-muted">{{ card.answer }}</p>
+          <div class="mt-4 flex items-center justify-between text-xs text-text-muted">
+            <span>Difficulty: {{ card.difficulty || 'n/a' }}</span>
+            <div class="flex items-center gap-2">
+              <button
+                class="btn-ghost px-3 py-1"
+                type="button"
+                (click)="openCardDialog(card)"
+              >
+                Edit
+              </button>
+              <button
+                class="btn-ghost border-rose-200 text-rose-600 hover:bg-rose-50 px-3 py-1"
+                type="button"
+                (click)="deleteCard(card)"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
+          *ngIf="cards.length === 0"
+        >
+          No cards yet. Add your first card.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="mx-auto w-full max-w-6xl px-4 py-8 text-text-muted" *ngIf="loading">
+  Loading...
+</div>
+
+<app-card-form-dialog
+  [(visible)]="showCardDialog"
+  [card]="editingCard"
+  (save)="saveCard($event)"
+></app-card-form-dialog>

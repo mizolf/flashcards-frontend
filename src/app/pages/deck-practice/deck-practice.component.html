@@ -1,0 +1,76 @@
+<section class="mx-auto w-full max-w-4xl px-4 py-10 text-text" *ngIf="!loading">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">Practice</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ deck?.name || 'Deck' }}</h1>
+      <p class="mt-1 text-sm text-text-muted" *ngIf="deck">
+        {{ deck.cardCount }} cards | {{ deck.isPublic ? 'Public' : 'Private' }}
+      </p>
+    </div>
+    <button pButton type="button" label="Exit" class="p-button-text" (click)="exit()"></button>
+  </div>
+
+  <div class="mt-10" *ngIf="currentCard; else emptyState">
+    <div class="flip-card" [class.is-flipped]="showAnswer">
+      <div class="flip-card__inner">
+        <div class="flip-card__face flip-card__face--front surface-card">
+          <div class="text-xs uppercase tracking-[0.3em] text-text-muted">
+            Card {{ index + 1 }} / {{ cards.length }}
+          </div>
+          <h2 class="mt-4 text-2xl font-semibold text-text">{{ currentCard?.question }}</h2>
+          <p class="mt-4 text-sm text-text-muted">Tap show answer to flip.</p>
+        </div>
+
+        <div class="flip-card__face flip-card__face--back surface-card">
+          <div class="text-xs uppercase tracking-[0.3em] text-text-muted">
+            Answer
+          </div>
+          <h2 class="mt-4 text-2xl font-semibold text-text">{{ currentCard?.answer }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="toggleAnswer()"
+      >
+        {{ showAnswer ? 'Hide answer' : 'Show answer' }}
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="prevCard()"
+        [disabled]="index === 0"
+      >
+        Prev
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="nextCard()"
+        [disabled]="index === cards.length - 1"
+      >
+        Next
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="restart()"
+      >
+        Restart
+      </button>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="mt-10 flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted">
+      No cards in this deck yet.
+    </div>
+  </ng-template>
+</section>
+
+<div class="mx-auto w-full max-w-4xl px-4 py-10 text-text-muted" *ngIf="loading">
+  Loading...
+</div>

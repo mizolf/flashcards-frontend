@@ -46,14 +46,8 @@ export class DeckFormDialogComponent implements OnChanges {
   submit(): void {
     const trimmedName = this.name.trim();
     if (!trimmedName) {
-      console.warn('DeckFormDialogComponent.submit: name is empty');
       return;
     }
-
-    console.log('DeckFormDialogComponent.submit: emitting save', {
-      name: trimmedName,
-      isPublic: this.isPublic
-    });
     this.save.emit({ name: trimmedName, isPublic: this.isPublic });
   }
 
