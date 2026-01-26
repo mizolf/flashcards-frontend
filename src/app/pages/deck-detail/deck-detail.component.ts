@@ -29,23 +29,40 @@ import { UI_TEXT } from '../../constants/ui-text';
   styleUrl: './deck-detail.component.scss'
 })
 export class DeckDetailComponent implements OnInit {
+  /** Static UI copy for the template. */
   readonly text = UI_TEXT;
+  /** Loaded deck with full card list. */
   deck: DeckDetailResponse | null = null;
+  /** Local card list for rendering and filtering. */
   cards: CardResponse[] = [];
+  /** True while initial load is running. */
   initialLoading = true;
+  /** True while a refresh is running. */
   refreshing = false;
+  /** True while deck save request is running. */
   saving = false;
+  /** True while card save request is running. */
   cardSaving = false;
+  /** True while card delete request is running. */
   cardDeleting = false;
+  /** Controls the card form dialog visibility. */
   showCardDialog = false;
+  /** Card currently being edited in the dialog. */
   editingCard: CardResponse | null = null;
+  /** Controls the delete confirmation dialog visibility. */
   showDeleteDialog = false;
+  /** Card pending deletion in the confirm dialog. */
   pendingDeleteCard: CardResponse | null = null;
+  /** Editable deck name bound to the form. */
   deckName = '';
+  /** Editable public/private flag bound to the form. */
   deckIsPublic = false;
+  /** Unique tags computed from the deck cards. */
   availableTags: string[] = [];
+  /** Currently selected tag filter. */
   selectedTag: string | null = null;
 
+  /** Provides routing and deck/card services for the detail view. */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -53,15 +70,18 @@ export class DeckDetailComponent implements OnInit {
     private cardService: CardService
   ) {}
 
+  /** Loads the deck on first render. */
   ngOnInit(): void {
     this.loadDeck(true);
   }
 
+  /** Opens the card dialog in create or edit mode. */
   openCardDialog(card?: CardResponse): void {
     this.editingCard = card ?? null;
     this.showCardDialog = true;
   }
 
+  /** Creates or updates a card, then refreshes the deck. */
   saveCard(request: CreateCardRequest): void {
     if (!this.deck) {
       return;
@@ -101,11 +121,13 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
+  /** Opens the delete confirmation dialog for a card. */
   deleteCard(card: CardResponse): void {
     this.pendingDeleteCard = card;
     this.showDeleteDialog = true;
   }
 
+  /** Toggles the tag filter selection. */
   selectTag(tag: string | null): void {
     if (this.selectedTag === tag) {
       this.selectedTag = null;
@@ -114,6 +136,7 @@ export class DeckDetailComponent implements OnInit {
     this.selectedTag = tag;
   }
 
+  /** Returns cards filtered by the selected tag. */
   get filteredCards(): CardResponse[] {
     if (!this.selectedTag) {
       return this.cards;
@@ -124,10 +147,12 @@ export class DeckDetailComponent implements OnInit {
     return this.cards.filter((card) => card.tag === this.selectedTag);
   }
 
+  /** Navigates back to the My Decks screen. */
   goBack(): void {
     this.router.navigate(['/my-decks']);
   }
 
+  /** Loads deck details and updates view state. */
   private loadDeck(showLoader = true): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
     if (!deckId) {
@@ -161,6 +186,7 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
+  /** Saves the deck settings and refreshes on success. */
   saveDeck(): void {
     if (!this.deck) {
       return;
@@ -183,6 +209,7 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
+  /** Cancels the delete dialog if a delete is not in progress. */
   cancelDeleteCard(): void {
     if (this.cardDeleting) {
       return;
@@ -191,6 +218,7 @@ export class DeckDetailComponent implements OnInit {
     this.pendingDeleteCard = null;
   }
 
+  /** Confirms card deletion and refreshes the deck. */
   confirmDeleteCard(): void {
     if (!this.deck || !this.pendingDeleteCard || this.cardDeleting) {
       return;
@@ -210,6 +238,7 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
+  /** Maps numeric difficulty to display label. */
   getDifficultyLabel(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'LOW';
@@ -223,6 +252,7 @@ export class DeckDetailComponent implements OnInit {
     return 'N/A';
   }
 
+  /** Returns a border class based on card difficulty. */
   getDifficultyBorderClass(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'border-emerald-300';
@@ -236,6 +266,7 @@ export class DeckDetailComponent implements OnInit {
     return 'border-border';
   }
 
+  /** Builds the tag list and keeps the selection valid. */
   private updateAvailableTags(cards: CardResponse[]): void {
     const next = new Set<string>();
     let hasUntagged = false;

@@ -17,37 +17,54 @@ import { UI_TEXT } from '../../constants/ui-text';
   styleUrl: './deck-practice.component.scss'
 })
 export class DeckPracticeComponent implements OnInit {
+  /** Static UI copy for the template. */
   readonly text = UI_TEXT;
+  /** Loaded deck with cards for practice. */
   deck: DeckDetailResponse | null = null;
+  /** Full card list from the deck. */
   cards: CardResponse[] = [];
+  /** Cards after tag/difficulty filters. */
   filteredCards: CardResponse[] = [];
+  /** Cards actually displayed (filtered + ordered). */
   displayCards: CardResponse[] = [];
+  /** True while initial load is running. */
   initialLoading = true;
+  /** True when answer side is visible. */
   showAnswer = false;
+  /** Index of the current card in displayCards. */
   index = 0;
+  /** Unique tags computed from the deck cards. */
   availableTags: string[] = [];
+  /** Selected tag filter (null = all). */
   selectedTag: string | null = null;
+  /** Selected difficulty filter (null = all). */
   selectedDifficulty: number | null = null;
+  /** Whether the current order is randomized. */
   randomOrder = false;
 
+  /** Provides routing and deck access for practice mode. */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private deckService: DeckService
   ) {}
 
+  /** Loads the deck on first render. */
   ngOnInit(): void {
     this.loadDeck();
   }
 
+  /** Current card based on the active index. */
   get currentCard(): CardResponse | null {
     return this.displayCards[this.index] ?? null;
   }
 
+  /** Toggles answer visibility for the current card. */
   toggleAnswer(): void {
     this.showAnswer = !this.showAnswer;
   }
 
+  /** Advances to the next card in the current list. */
   nextCard(): void {
     if (this.index < this.displayCards.length - 1) {
       this.index += 1;
@@ -55,6 +72,7 @@ export class DeckPracticeComponent implements OnInit {
     }
   }
 
+  /** Moves back to the previous card in the current list. */
   prevCard(): void {
     if (this.index > 0) {
       this.index -= 1;
@@ -62,16 +80,19 @@ export class DeckPracticeComponent implements OnInit {
     }
   }
 
+  /** Resets the practice session to the first card. */
   restart(): void {
     this.index = 0;
     this.showAnswer = false;
   }
 
+  /** Toggles random order and reapplies filters. */
   toggleRandomOrder(): void {
     this.randomOrder = !this.randomOrder;
     this.applyFilters(true);
   }
 
+  /** Shuffles the current filtered list and restarts the session. */
   shuffleNow(): void {
     this.randomOrder = true;
     this.displayCards = this.shuffleCards(this.filteredCards);
@@ -79,14 +100,17 @@ export class DeckPracticeComponent implements OnInit {
     this.showAnswer = false;
   }
 
+  /** Applies tag/difficulty filters when the UI changes. */
   onFiltersChange(): void {
     this.applyFilters(true);
   }
 
+  /** Navigates back to My Decks. */
   exit(): void {
     this.router.navigate(['/my-decks']);
   }
 
+  /** Returns a border class based on card difficulty. */
   getDifficultyBorderClass(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'border-emerald-300';
@@ -100,6 +124,7 @@ export class DeckPracticeComponent implements OnInit {
     return 'border-border';
   }
 
+  /** Loads deck data and initializes filters and ordering. */
   private loadDeck(): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
     if (!deckId) {
@@ -124,6 +149,7 @@ export class DeckPracticeComponent implements OnInit {
     });
   }
 
+  /** Filters cards by tag/difficulty and applies ordering. */
   private applyFilters(resetIndex: boolean): void {
     const filtered = this.cards.filter((card) => {
       if (this.selectedTag) {
@@ -152,6 +178,7 @@ export class DeckPracticeComponent implements OnInit {
     }
   }
 
+  /** Shuffles a list using Fisher-Yates. */
   private shuffleCards(cards: CardResponse[]): CardResponse[] {
     const next = [...cards];
     for (let i = next.length - 1; i > 0; i -= 1) {
@@ -161,6 +188,7 @@ export class DeckPracticeComponent implements OnInit {
     return next;
   }
 
+  /** Builds the tag list and keeps the selection valid. */
   private updateAvailableTags(cards: CardResponse[]): void {
     const next = new Set<string>();
     let hasUntagged = false;

@@ -19,19 +19,33 @@ import { UI_TEXT } from '../../constants/ui-text';
   styleUrl: './my-decks.component.scss'
 })
 export class MyDecksComponent implements OnInit {
+  /** Static UI copy for the template. */
   readonly text = UI_TEXT;
+  /** Controls the create-deck dialog visibility. */
   showCreateDialog = false;
+  /** Controls the "no cards" dialog visibility. */
   showNoCardsDialog = false;
+  /** Deck id used by the no-cards dialog action. */
   noCardsDeckId: number | null = null;
+  /** Deck name shown in the no-cards dialog text. */
   noCardsDeckName = '';
+  /** Controls the delete confirmation dialog visibility. */
   showDeleteDialog = false;
+  /** Deck pending deletion in the confirm dialog. */
   pendingDeleteDeck: DeckResponse | null = null;
+  /** True while delete request is in flight. */
   deckDeleting = false;
+  /** Raw deck list loaded from the API. */
   decks: DeckResponse[] = [];
+  /** Average difficulty per deck id for gradient styling. */
   difficultyByDeckId: Record<number, number | null> = {};
+  /** True while initial page load is running. */
   initialLoading = true;
+  /** True while a background refresh is running. */
   refreshing = false;
+  /** Current sort selection for the deck lists. */
   sortOption: 'newest' | 'oldest' | 'difficulty-high' | 'difficulty-low' = 'newest';
+  /** Select options displayed in the sort dropdown. */
   sortOptions = [
     { value: 'newest', label: UI_TEXT.myDecks.sortOptions.newest },
     { value: 'oldest', label: UI_TEXT.myDecks.sortOptions.oldest },
@@ -39,32 +53,40 @@ export class MyDecksComponent implements OnInit {
     { value: 'difficulty-low', label: UI_TEXT.myDecks.sortOptions.difficultyLow }
   ] as const;
 
+  /** Provides API access and routing for the deck list view. */
   constructor(private deckService: DeckService, private router: Router) {}
 
+  /** Loads decks on first render. */
   ngOnInit(): void {
     this.loadDecks(true);
   }
 
+  /** Public decks derived from the full list. */
   get publicDecks(): DeckResponse[] {
     return this.decks.filter((deck) => deck.isPublic);
   }
 
+  /** Private decks derived from the full list. */
   get privateDecks(): DeckResponse[] {
     return this.decks.filter((deck) => !deck.isPublic);
   }
 
+  /** Sorted public decks based on the current sort option. */
   get sortedPublicDecks(): DeckResponse[] {
     return this.sortDecks(this.publicDecks);
   }
 
+  /** Sorted private decks based on the current sort option. */
   get sortedPrivateDecks(): DeckResponse[] {
     return this.sortDecks(this.privateDecks);
   }
 
+  /** Opens the create deck dialog. */
   openCreateDialog(): void {
     this.showCreateDialog = true;
   }
 
+  /** Opens practice if the deck has cards, otherwise shows the empty dialog. */
   openDeck(deck: DeckResponse): void {
     if (deck.cardCount === 0) {
       this.noCardsDeckId = deck.id;
@@ -75,6 +97,7 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id, 'practice']);
   }
 
+  /** Navigates to the deck detail view and stops card click propagation. */
   openDetails(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -82,6 +105,7 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id]);
   }
 
+  /** Navigates to deck detail with the add-card query param. */
   openAddCards(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -89,6 +113,7 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id], { queryParams: { addCard: '1' } });
   }
 
+  /** Opens the delete confirmation dialog for a deck. */
   deleteDeck(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -97,6 +122,7 @@ export class MyDecksComponent implements OnInit {
     this.showDeleteDialog = true;
   }
 
+  /** Returns a gradient class based on computed difficulty average. */
   getDeckGradient(deck: DeckResponse, index: number): string {
     const avg = this.difficultyByDeckId[deck.id];
     if (avg !== undefined && avg !== null) {
@@ -111,6 +137,7 @@ export class MyDecksComponent implements OnInit {
     return 'from-slate-700/80 to-slate-900/80';
   }
 
+  /** Creates a new deck and refreshes the list on success. */
   createOrUpdateDeck(request: CreateDeckRequest): void {
     this.deckService.createDeck(request).subscribe({
       next: () => {
@@ -123,12 +150,14 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
+  /** Closes the empty-deck dialog and resets its state. */
   closeNoCardsDialog(): void {
     this.showNoCardsDialog = false;
     this.noCardsDeckId = null;
     this.noCardsDeckName = '';
   }
 
+  /** Routes to add cards for the selected deck and closes the dialog. */
   goToAddCards(): void {
     if (this.noCardsDeckId) {
       this.router.navigate(['/decks', this.noCardsDeckId], { queryParams: { addCard: '1' } });
@@ -136,6 +165,7 @@ export class MyDecksComponent implements OnInit {
     this.closeNoCardsDialog();
   }
 
+  /** Cancels the delete dialog if a delete is not in progress. */
   cancelDeleteDeck(): void {
     if (this.deckDeleting) {
       return;
@@ -144,6 +174,7 @@ export class MyDecksComponent implements OnInit {
     this.pendingDeleteDeck = null;
   }
 
+  /** Confirms delete and refreshes the list on success. */
   confirmDeleteDeck(): void {
     if (!this.pendingDeleteDeck || this.deckDeleting) {
       return;
@@ -163,6 +194,7 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
+  /** Fetches the deck list and toggles loading or refresh states. */
   private loadDecks(showLoader = true): void {
     if (showLoader) {
       this.initialLoading = true;
@@ -183,6 +215,7 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
+  /** Calculates per-deck average difficulty for gradient coloring. */
   private updateDifficultyAverages(decks: DeckResponse[]): void {
     if (decks.length === 0) {
       this.difficultyByDeckId = {};
@@ -208,6 +241,7 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
+  /** Computes the average difficulty for a set of cards. */
   private calculateAverageDifficulty(cards: CardResponse[]): number | null {
     const values = cards
       .map((card) => card.difficulty)
@@ -219,6 +253,7 @@ export class MyDecksComponent implements OnInit {
     return sum / values.length;
   }
 
+  /** Sorts decks by date or difficulty based on the current sort option. */
   private sortDecks(decks: DeckResponse[]): DeckResponse[] {
     const sorted = [...decks];
     sorted.sort((a, b) => {
