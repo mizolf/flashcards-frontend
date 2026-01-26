@@ -3,7 +3,6 @@ import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from
 import { FormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { InputTextarea } from 'primeng/inputtextarea';
 
@@ -17,7 +16,6 @@ import { CardResponse, CreateCardRequest } from '../../models/Card.dto';
     FormsModule,
     ButtonModule,
     DialogModule,
-    InputNumberModule,
     InputTextModule,
     InputTextarea
   ],
@@ -27,6 +25,7 @@ import { CardResponse, CreateCardRequest } from '../../models/Card.dto';
 export class CardFormDialogComponent implements OnChanges {
   @Input() visible: boolean = false;
   @Input() card: CardResponse | null = null;
+  @Input() saving: boolean = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<CreateCardRequest>();
 
@@ -34,6 +33,11 @@ export class CardFormDialogComponent implements OnChanges {
   answer = '';
   tag = '';
   difficulty: number | null = null;
+  difficultyOptions = [
+    { label: 'LOW', value: 1 },
+    { label: 'MEDIUM', value: 2 },
+    { label: 'HARD', value: 3 }
+  ];
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['card']) {
@@ -76,5 +80,15 @@ export class CardFormDialogComponent implements OnChanges {
     this.answer = '';
     this.tag = '';
     this.difficulty = null;
+  }
+
+  get visibleDifficultyOptions(): { label: string; value: number }[] {
+    if (this.difficulty && !this.difficultyOptions.some((opt) => opt.value === this.difficulty)) {
+      return [
+        ...this.difficultyOptions,
+        { label: `${this.difficulty} (existing)`, value: this.difficulty }
+      ];
+    }
+    return this.difficultyOptions;
   }
 }

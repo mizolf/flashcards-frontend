@@ -20,5 +20,5 @@ export interface DeckDetailResponse {
   createdAt: string;
   ownerUsername: string;
   cardCount: number;
-  cards: CardResponse[];
+  cards: CardResponse[];  
 }

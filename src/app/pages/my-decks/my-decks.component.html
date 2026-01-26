@@ -1,34 +1,48 @@
-<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text" (click)="closeMenu()">
+<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text">
   <div class="flex flex-wrap items-center justify-between gap-4">
     <div>
-      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">Workspace</p>
-      <h1 class="mt-2 text-3xl font-semibold text-text">My Decks</h1>
-      <p class="mt-1 text-sm text-text-muted">Organize public decks and your private study sets.</p>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.myDecks.workspaceLabel }}</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ text.myDecks.title }}</h1>
+      <p class="mt-1 text-sm text-text-muted">{{ text.myDecks.subtitle }}</p>
     </div>
     <button
       pButton
       type="button"
-      label="Novi deck"
+      [label]="text.myDecks.newDeck"
       icon="pi pi-plus"
       (click)="openCreateDialog(); $event.stopPropagation()"
     ></button>
   </div>
 
-  <div class="mt-8 space-y-10" *ngIf="!loading">
+  <div class="mt-8 space-y-10" *ngIf="!initialLoading">
+    <div class="flex items-center gap-2">
+      <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">{{ text.myDecks.sortLabel }}</span>
+        <select
+          class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [(ngModel)]="sortOption"
+          [attr.aria-label]="text.myDecks.sortAriaLabel"
+        >
+          <option *ngFor="let option of sortOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
     <section>
       <div class="mb-4 flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-semibold text-text">Public decks</h2>
-          <p class="text-xs text-text-muted">Visible to everyone.</p>
+          <h2 class="text-lg font-semibold text-text">{{ text.myDecks.publicTitle }}</h2>
+          <p class="text-xs text-text-muted">{{ text.myDecks.publicSubtitle }}</p>
         </div>
-        <span class="text-sm text-text-muted">{{ publicDecks.length }} total</span>
+        <span class="text-sm text-text-muted">{{ publicDecks.length }} {{ text.myDecks.totalLabel }}</span>
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="relative" *ngFor="let deck of publicDecks; let i = index">
+        <div class="relative" *ngFor="let deck of sortedPublicDecks; let i = index">
           <div
-            class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
-            (click)="openDeck(deck)"
+            class="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
           >
             <div
               class="absolute inset-0 bg-gradient-to-br opacity-90"
@@ -37,40 +51,37 @@
             <div class="relative flex h-full flex-col gap-5 p-5">
               <div class="flex items-start justify-between gap-3">
                 <h3 class="text-lg font-semibold leading-snug">{{ deck.name }}</h3>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/90">
+                  {{ text.myDecks.publicBadge }}
+                </span>
+                <span class="text-sm text-white/90">{{ deck.cardCount }} {{ text.myDecks.cardsLabel }}</span>
+              </div>
+              <div class="mt-auto flex flex-wrap items-center gap-2">
                 <button
-                  class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide"
+                  class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
                   type="button"
-                  (click)="toggleMenu(deck.id, $event)"
+                  (click)="openDeck(deck)"
                 >
-                  ...
+                  {{ text.myDecks.play }}
+                </button>
+                <button
+                  class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
+                  type="button"
+                  (click)="openDetails(deck, $event)"
+                >
+                  {{ text.myDecks.edit }}
+                </button>
+                <button
+                  class="rounded-full bg-rose-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-rose-500"
+                  type="button"
+                  (click)="deleteDeck(deck, $event)"
+                >
+                  {{ text.myDecks.delete }}
                 </button>
               </div>
-              <p class="text-sm text-white/90">{{ deck.cardCount }} cards</p>
-              <div class="mt-auto flex items-center gap-2">
-                <span class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide">Public</span>
-              </div>
             </div>
-          </div>
-
-          <div
-            class="absolute right-0 top-12 z-20 w-40 rounded-xl border border-border bg-surface-card p-2 text-sm text-text shadow-card"
-            *ngIf="openMenuDeckId === deck.id"
-            (click)="$event.stopPropagation()"
-          >
-            <button
-              class="w-full rounded-lg px-3 py-2 text-left text-text hover:bg-surface-soft"
-              type="button"
-              (click)="openManageDeck(deck, $event)"
-            >
-              Edit deck
-            </button>
-            <button
-              class="w-full rounded-lg px-3 py-2 text-left text-rose-600 hover:bg-rose-50"
-              type="button"
-              (click)="deleteDeck(deck, $event)"
-            >
-              Delete deck
-            </button>
           </div>
         </div>
 
@@ -78,7 +89,7 @@
           class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
           *ngIf="publicDecks.length === 0"
         >
-          No public decks yet.
+          {{ text.myDecks.noPublicDecks }}
         </div>
       </div>
     </section>
@@ -86,17 +97,16 @@
     <section>
       <div class="mb-4 flex items-center justify-between">
         <div>
-          <h2 class="text-lg font-semibold text-text">Private decks</h2>
-          <p class="text-xs text-text-muted">Only visible to you.</p>
+          <h2 class="text-lg font-semibold text-text">{{ text.myDecks.privateTitle }}</h2>
+          <p class="text-xs text-text-muted">{{ text.myDecks.privateSubtitle }}</p>
         </div>
-        <span class="text-sm text-text-muted">{{ privateDecks.length }} total</span>
+        <span class="text-sm text-text-muted">{{ privateDecks.length }} {{ text.myDecks.totalLabel }}</span>
       </div>
 
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="relative" *ngFor="let deck of privateDecks; let i = index">
+        <div class="relative" *ngFor="let deck of sortedPrivateDecks; let i = index">
           <div
-            class="group relative cursor-pointer overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
-            (click)="openDeck(deck)"
+            class="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
           >
             <div
               class="absolute inset-0 bg-gradient-to-br opacity-90"
@@ -105,40 +115,37 @@
             <div class="relative flex h-full flex-col gap-5 p-5">
               <div class="flex items-start justify-between gap-3">
                 <h3 class="text-lg font-semibold leading-snug">{{ deck.name }}</h3>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/90">
+                  {{ text.myDecks.privateBadge }}
+                </span>
+                <span class="text-sm text-white/90">{{ deck.cardCount }} {{ text.myDecks.cardsLabel }}</span>
+              </div>
+              <div class="mt-auto flex flex-wrap items-center gap-2">
                 <button
-                  class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide"
+                  class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
                   type="button"
-                  (click)="toggleMenu(deck.id, $event)"
+                  (click)="openDeck(deck)"
                 >
-                  ...
+                  {{ text.myDecks.play }}
+                </button>
+                <button
+                  class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
+                  type="button"
+                  (click)="openDetails(deck, $event)"
+                >
+                  {{ text.myDecks.edit }}
+                </button>
+                <button
+                  class="rounded-full bg-rose-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-rose-500"
+                  type="button"
+                  (click)="deleteDeck(deck, $event)"
+                >
+                  {{ text.myDecks.delete }}
                 </button>
               </div>
-              <p class="text-sm text-white/90">{{ deck.cardCount }} cards</p>
-              <div class="mt-auto flex items-center gap-2">
-                <span class="rounded-full bg-white/20 px-2 py-1 text-xs uppercase tracking-wide">Private</span>
-              </div>
             </div>
-          </div>
-
-          <div
-            class="absolute right-0 top-12 z-20 w-40 rounded-xl border border-border bg-surface-card p-2 text-sm text-text shadow-card"
-            *ngIf="openMenuDeckId === deck.id"
-            (click)="$event.stopPropagation()"
-          >
-            <button
-              class="w-full rounded-lg px-3 py-2 text-left text-text hover:bg-surface-soft"
-              type="button"
-              (click)="openManageDeck(deck, $event)"
-            >
-              Edit deck
-            </button>
-            <button
-              class="w-full rounded-lg px-3 py-2 text-left text-rose-600 hover:bg-rose-50"
-              type="button"
-              (click)="deleteDeck(deck, $event)"
-            >
-              Delete deck
-            </button>
           </div>
         </div>
 
@@ -146,16 +153,52 @@
           class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
           *ngIf="privateDecks.length === 0"
         >
-          No private decks yet.
+          {{ text.myDecks.noPrivateDecks }}
         </div>
       </div>
     </section>
   </div>
 
-  <div class="mt-6 text-text-muted" *ngIf="loading">
-    Loading...
-  </div>
 </section>
+
+<div class="app-loading-overlay" *ngIf="initialLoading || refreshing">
+  <div class="app-loading-spinner" [attr.aria-label]="text.common.loadingAriaLabel"></div>
+</div>
+
+<div class="app-loading-overlay" *ngIf="showNoCardsDialog">
+  <div class="surface-card w-full max-w-md p-6 text-text shadow-card">
+    <h3 class="text-lg font-semibold text-text">{{ text.myDecks.noCardsTitle }}</h3>
+    <p class="mt-2 text-sm text-text-muted">
+      {{ noCardsDeckName }} {{ text.myDecks.noCardsBodySuffix }}
+    </p>
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button class="btn-ghost" type="button" (click)="closeNoCardsDialog()">{{ text.myDecks.close }}</button>
+      <button class="btn-primary" type="button" (click)="goToAddCards()">{{ text.myDecks.addCards }}</button>
+    </div>
+  </div>
+</div>
+
+<div class="app-loading-overlay" *ngIf="showDeleteDialog">
+  <div class="surface-card w-full max-w-md p-6 text-text shadow-card">
+    <h3 class="text-lg font-semibold text-text">{{ text.myDecks.deleteDeckTitle }}</h3>
+    <p class="mt-2 text-sm text-text-muted">
+      {{ text.myDecks.deleteDeckConfirmPrefix }}{{ pendingDeleteDeck?.name }}{{ text.myDecks.deleteDeckConfirmSuffix }}
+    </p>
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button class="btn-ghost" type="button" [disabled]="deckDeleting" (click)="cancelDeleteDeck()">
+        {{ text.myDecks.cancel }}
+      </button>
+      <button
+        pButton
+        type="button"
+        [label]="text.myDecks.delete"
+        [loading]="deckDeleting"
+        [disabled]="deckDeleting"
+        (click)="confirmDeleteDeck()"
+      ></button>
+    </div>
+  </div>
+</div>
 
 <app-deck-form-dialog
   [(visible)]="showCreateDialog"
