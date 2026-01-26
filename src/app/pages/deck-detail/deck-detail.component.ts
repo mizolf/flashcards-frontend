@@ -152,6 +152,14 @@ export class DeckDetailComponent implements OnInit {
     this.router.navigate(['/my-decks']);
   }
 
+  /** Navigates to the quick learn screen for this deck. */
+  openQuickLearn(): void {
+    if (!this.deck) {
+      return;
+    }
+    this.router.navigate(['/decks', this.deck.id, 'learn']);
+  }
+
   /** Loads deck details and updates view state. */
   private loadDeck(showLoader = true): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
