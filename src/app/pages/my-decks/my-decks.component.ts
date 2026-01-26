@@ -86,7 +86,10 @@ export class MyDecksComponent implements OnInit {
     this.showCreateDialog = true;
   }
 
-  /** Opens practice if the deck has cards, otherwise shows the empty dialog. */
+  /**
+   * Opens practice if the deck has cards, otherwise shows the empty dialog.
+   * @param deck Deck to practice.
+   */
   openDeck(deck: DeckResponse): void {
     if (deck.cardCount === 0) {
       this.noCardsDeckId = deck.id;
@@ -97,7 +100,11 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id, 'practice']);
   }
 
-  /** Navigates to the deck detail view and stops card click propagation. */
+  /**
+   * Navigates to the deck detail view and stops card click propagation.
+   * @param deck Deck to open.
+   * @param event Optional click event used to stop propagation.
+   */
   openDetails(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -105,7 +112,11 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id]);
   }
 
-  /** Navigates to deck detail with the add-card query param. */
+  /**
+   * Navigates to deck detail with the add-card query param.
+   * @param deck Deck to open.
+   * @param event Optional click event used to stop propagation.
+   */
   openAddCards(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -113,7 +124,29 @@ export class MyDecksComponent implements OnInit {
     this.router.navigate(['/decks', deck.id], { queryParams: { addCard: '1' } });
   }
 
-  /** Opens the delete confirmation dialog for a deck. */
+  /**
+   * Navigates to quick learn for the selected deck.
+   * @param deck Deck to learn from.
+   * @param event Optional click event used to stop propagation.
+   */
+  openQuickLearn(deck: DeckResponse, event?: MouseEvent): void {
+    if (event) {
+      event.stopPropagation();
+    }
+    if (deck.cardCount === 0) {
+      this.noCardsDeckId = deck.id;
+      this.noCardsDeckName = deck.name;
+      this.showNoCardsDialog = true;
+      return;
+    }
+    this.router.navigate(['/decks', deck.id, 'learn']);
+  }
+
+  /**
+   * Opens the delete confirmation dialog for a deck.
+   * @param deck Deck to delete.
+   * @param event Optional click event used to stop propagation.
+   */
   deleteDeck(deck: DeckResponse, event?: MouseEvent): void {
     if (event) {
       event.stopPropagation();
@@ -122,7 +155,11 @@ export class MyDecksComponent implements OnInit {
     this.showDeleteDialog = true;
   }
 
-  /** Returns a gradient class based on computed difficulty average. */
+  /**
+   * Returns a gradient class based on computed difficulty average.
+   * @param deck Deck to style.
+   * @param index Visual index (unused, kept for template signature).
+   */
   getDeckGradient(deck: DeckResponse, index: number): string {
     const avg = this.difficultyByDeckId[deck.id];
     if (avg !== undefined && avg !== null) {
@@ -137,7 +174,10 @@ export class MyDecksComponent implements OnInit {
     return 'from-slate-700/80 to-slate-900/80';
   }
 
-  /** Creates a new deck and refreshes the list on success. */
+  /**
+   * Creates a new deck and refreshes the list on success.
+   * @param request New deck payload.
+   */
   createOrUpdateDeck(request: CreateDeckRequest): void {
     this.deckService.createDeck(request).subscribe({
       next: () => {
@@ -194,7 +234,10 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
-  /** Fetches the deck list and toggles loading or refresh states. */
+  /**
+   * Fetches the deck list and toggles loading or refresh states.
+   * @param showLoader When true, shows the initial loader instead of refresh state.
+   */
   private loadDecks(showLoader = true): void {
     if (showLoader) {
       this.initialLoading = true;
@@ -215,7 +258,10 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
-  /** Calculates per-deck average difficulty for gradient coloring. */
+  /**
+   * Calculates per-deck average difficulty for gradient coloring.
+   * @param decks Deck list used to fetch card details.
+   */
   private updateDifficultyAverages(decks: DeckResponse[]): void {
     if (decks.length === 0) {
       this.difficultyByDeckId = {};
@@ -241,7 +287,10 @@ export class MyDecksComponent implements OnInit {
     });
   }
 
-  /** Computes the average difficulty for a set of cards. */
+  /**
+   * Computes the average difficulty for a set of cards.
+   * @param cards Cards used in the average calculation.
+   */
   private calculateAverageDifficulty(cards: CardResponse[]): number | null {
     const values = cards
       .map((card) => card.difficulty)
@@ -253,7 +302,10 @@ export class MyDecksComponent implements OnInit {
     return sum / values.length;
   }
 
-  /** Sorts decks by date or difficulty based on the current sort option. */
+  /**
+   * Sorts decks by date or difficulty based on the current sort option.
+   * @param decks Deck list to sort.
+   */
   private sortDecks(decks: DeckResponse[]): DeckResponse[] {
     const sorted = [...decks];
     sorted.sort((a, b) => {

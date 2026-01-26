@@ -78,7 +78,7 @@
           </div>
           <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
             <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.accuracy }}</p>
-            <p class="mt-2 text-base font-semibold text-text">{{ (results.sessionStats.accuracy * 100) | number:'1.0-0' }}%</p>
+            <p class="mt-2 text-base font-semibold text-text">{{ getAccuracyPercent(results.sessionStats.accuracy) | number:'1.0-0' }}%</p>
           </div>
         </div>
       </div>
@@ -105,7 +105,7 @@
           <div class="rounded-2xl border border-border-subtle bg-surface-card p-4 sm:col-span-2">
             <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.overallAccuracy }}</p>
             <p class="mt-2 text-base font-semibold text-text">
-              {{ (results.deckStats.overallAccuracy * 100) | number:'1.0-0' }}%
+              {{ getAccuracyPercent(results.deckStats.overallAccuracy) | number:'1.0-0' }}%
             </p>
           </div>
         </div>

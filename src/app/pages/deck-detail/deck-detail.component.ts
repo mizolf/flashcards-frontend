@@ -75,13 +75,19 @@ export class DeckDetailComponent implements OnInit {
     this.loadDeck(true);
   }
 
-  /** Opens the card dialog in create or edit mode. */
+  /**
+   * Opens the card dialog in create or edit mode.
+   * @param card Optional card to edit.
+   */
   openCardDialog(card?: CardResponse): void {
     this.editingCard = card ?? null;
     this.showCardDialog = true;
   }
 
-  /** Creates or updates a card, then refreshes the deck. */
+  /**
+   * Creates or updates a card, then refreshes the deck.
+   * @param request Card payload.
+   */
   saveCard(request: CreateCardRequest): void {
     if (!this.deck) {
       return;
@@ -121,13 +127,19 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
-  /** Opens the delete confirmation dialog for a card. */
+  /**
+   * Opens the delete confirmation dialog for a card.
+   * @param card Card to delete.
+   */
   deleteCard(card: CardResponse): void {
     this.pendingDeleteCard = card;
     this.showDeleteDialog = true;
   }
 
-  /** Toggles the tag filter selection. */
+  /**
+   * Toggles the tag filter selection.
+   * @param tag Selected tag (null clears selection).
+   */
   selectTag(tag: string | null): void {
     if (this.selectedTag === tag) {
       this.selectedTag = null;
@@ -152,15 +164,10 @@ export class DeckDetailComponent implements OnInit {
     this.router.navigate(['/my-decks']);
   }
 
-  /** Navigates to the quick learn screen for this deck. */
-  openQuickLearn(): void {
-    if (!this.deck) {
-      return;
-    }
-    this.router.navigate(['/decks', this.deck.id, 'learn']);
-  }
-
-  /** Loads deck details and updates view state. */
+  /**
+   * Loads deck details and updates view state.
+   * @param showLoader When true, shows the initial loader instead of refresh state.
+   */
   private loadDeck(showLoader = true): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
     if (!deckId) {
@@ -194,7 +201,10 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
-  /** Saves the deck settings and refreshes on success. */
+  /**
+   * Saves the deck settings and refreshes on success.
+   * @remarks Uses the current form state for the payload.
+   */
   saveDeck(): void {
     if (!this.deck) {
       return;
@@ -246,7 +256,10 @@ export class DeckDetailComponent implements OnInit {
     });
   }
 
-  /** Maps numeric difficulty to display label. */
+  /**
+   * Maps numeric difficulty to display label.
+   * @param difficulty Numeric difficulty value.
+   */
   getDifficultyLabel(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'LOW';
@@ -260,7 +273,10 @@ export class DeckDetailComponent implements OnInit {
     return 'N/A';
   }
 
-  /** Returns a border class based on card difficulty. */
+  /**
+   * Returns a border class based on card difficulty.
+   * @param difficulty Numeric difficulty value.
+   */
   getDifficultyBorderClass(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'border-emerald-300';
@@ -274,7 +290,10 @@ export class DeckDetailComponent implements OnInit {
     return 'border-border';
   }
 
-  /** Builds the tag list and keeps the selection valid. */
+  /**
+   * Builds the tag list and keeps the selection valid.
+   * @param cards Cards used to derive unique tags.
+   */
   private updateAvailableTags(cards: CardResponse[]): void {
     const next = new Set<string>();
     let hasUntagged = false;

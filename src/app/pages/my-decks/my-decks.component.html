@@ -58,13 +58,21 @@
                 </span>
                 <span class="text-sm text-white/90">{{ deck.cardCount }} {{ text.myDecks.cardsLabel }}</span>
               </div>
-              <div class="mt-auto flex flex-wrap items-center gap-2">
+              <div class="mt-auto flex flex-wrap items-center gap-2" *ngIf="deck.cardCount > 0; else publicAddCards">
                 <button
                   class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
                   type="button"
                   (click)="openDeck(deck)"
                 >
                   {{ text.myDecks.play }}
+                </button>
+                <button
+                  class="rounded-full bg-sky-200/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-900 transition hover:bg-sky-100"
+                  type="button"
+                  (click)="openQuickLearn(deck, $event)"
+                >
+                  <i class="pi pi-bolt mr-1 text-[10px]" aria-hidden="true"></i>
+                  {{ text.quickLearn.label }}
                 </button>
                 <button
                   class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
@@ -81,6 +89,31 @@
                   {{ text.myDecks.delete }}
                 </button>
               </div>
+              <ng-template #publicAddCards>
+                <div class="mt-auto flex flex-wrap items-center gap-2">
+                  <button
+                    class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
+                    type="button"
+                    (click)="openAddCards(deck, $event)"
+                  >
+                    {{ text.myDecks.addCards }}
+                  </button>
+                  <button
+                    class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
+                    type="button"
+                    (click)="openDetails(deck, $event)"
+                  >
+                    {{ text.myDecks.edit }}
+                  </button>
+                  <button
+                    class="rounded-full bg-rose-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-rose-500"
+                    type="button"
+                    (click)="deleteDeck(deck, $event)"
+                  >
+                    {{ text.myDecks.delete }}
+                  </button>
+                </div>
+              </ng-template>
             </div>
           </div>
         </div>
@@ -122,13 +155,21 @@
                 </span>
                 <span class="text-sm text-white/90">{{ deck.cardCount }} {{ text.myDecks.cardsLabel }}</span>
               </div>
-              <div class="mt-auto flex flex-wrap items-center gap-2">
+              <div class="mt-auto flex flex-wrap items-center gap-2" *ngIf="deck.cardCount > 0; else privateAddCards">
                 <button
                   class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
                   type="button"
                   (click)="openDeck(deck)"
                 >
                   {{ text.myDecks.play }}
+                </button>
+                <button
+                  class="rounded-full bg-sky-200/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-900 transition hover:bg-sky-100"
+                  type="button"
+                  (click)="openQuickLearn(deck, $event)"
+                >
+                  <i class="pi pi-bolt mr-1 text-[10px]" aria-hidden="true"></i>
+                  {{ text.quickLearn.label }}
                 </button>
                 <button
                   class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
@@ -145,6 +186,31 @@
                   {{ text.myDecks.delete }}
                 </button>
               </div>
+              <ng-template #privateAddCards>
+                <div class="mt-auto flex flex-wrap items-center gap-2">
+                  <button
+                    class="rounded-full bg-emerald-400/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-emerald-300"
+                    type="button"
+                    (click)="openAddCards(deck, $event)"
+                  >
+                    {{ text.myDecks.addCards }}
+                  </button>
+                  <button
+                    class="rounded-full bg-amber-300/90 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-slate-900 transition hover:bg-amber-200"
+                    type="button"
+                    (click)="openDetails(deck, $event)"
+                  >
+                    {{ text.myDecks.edit }}
+                  </button>
+                  <button
+                    class="rounded-full bg-rose-500/80 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white transition hover:bg-rose-500"
+                    type="button"
+                    (click)="deleteDeck(deck, $event)"
+                  >
+                    {{ text.myDecks.delete }}
+                  </button>
+                </div>
+              </ng-template>
             </div>
           </div>
         </div>

@@ -110,7 +110,10 @@ export class DeckPracticeComponent implements OnInit {
     this.router.navigate(['/my-decks']);
   }
 
-  /** Returns a border class based on card difficulty. */
+  /**
+   * Returns a border class based on card difficulty.
+   * @param difficulty Numeric difficulty value.
+   */
   getDifficultyBorderClass(difficulty?: number | null): string {
     if (difficulty === 1) {
       return 'border-emerald-300';
@@ -124,7 +127,10 @@ export class DeckPracticeComponent implements OnInit {
     return 'border-border';
   }
 
-  /** Loads deck data and initializes filters and ordering. */
+  /**
+   * Loads deck data and initializes filters and ordering.
+   * @remarks Uses the route param id to fetch the deck.
+   */
   private loadDeck(): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
     if (!deckId) {
@@ -149,7 +155,10 @@ export class DeckPracticeComponent implements OnInit {
     });
   }
 
-  /** Filters cards by tag/difficulty and applies ordering. */
+  /**
+   * Filters cards by tag/difficulty and applies ordering.
+   * @param resetIndex When true, resets the current index to the first card.
+   */
   private applyFilters(resetIndex: boolean): void {
     const filtered = this.cards.filter((card) => {
       if (this.selectedTag) {
@@ -178,7 +187,10 @@ export class DeckPracticeComponent implements OnInit {
     }
   }
 
-  /** Shuffles a list using Fisher-Yates. */
+  /**
+   * Shuffles a list using Fisher-Yates.
+   * @param cards Cards to shuffle.
+   */
   private shuffleCards(cards: CardResponse[]): CardResponse[] {
     const next = [...cards];
     for (let i = next.length - 1; i > 0; i -= 1) {
@@ -188,7 +200,10 @@ export class DeckPracticeComponent implements OnInit {
     return next;
   }
 
-  /** Builds the tag list and keeps the selection valid. */
+  /**
+   * Builds the tag list and keeps the selection valid.
+   * @param cards Cards used to derive unique tags.
+   */
   private updateAvailableTags(cards: CardResponse[]): void {
     const next = new Set<string>();
     let hasUntagged = false;

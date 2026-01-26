@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
+import { switchMap } from 'rxjs';
 
 import {
   CardAnswerRequest,
@@ -9,6 +10,7 @@ import {
   QuickLearnResultResponse,
   QuickLearnSessionResponse
 } from '../../models/QuickLearn.dto';
+import { AuthenticationService } from '../../services/authentication.service';
 import { QuickLearnService } from '../../services/quick-learn.service';
 import { UI_TEXT } from '../../constants/ui-text';
 
@@ -39,10 +41,12 @@ export class DeckQuickLearnComponent implements OnInit {
   /** Local answer map keyed by card id. */
   answers: Record<number, boolean> = {};
 
+  /** Provides routing, auth, and quick-learn API access. */
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private quickLearnService: QuickLearnService
+    private quickLearnService: QuickLearnService,
+    private authService: AuthenticationService
   ) {}
 
   /** Starts a new quick learn session on first render. */
@@ -70,7 +74,10 @@ export class DeckQuickLearnComponent implements OnInit {
     this.showAnswer = !this.showAnswer;
   }
 
-  /** Records answer correctness and advances to the next card. */
+  /**
+   * Records answer correctness and advances to the next card.
+   * @param correct True if the user answered correctly.
+   */
   markAnswer(correct: boolean): void {
     const current = this.currentCard;
     if (!current) {
@@ -109,6 +116,18 @@ export class DeckQuickLearnComponent implements OnInit {
     });
   }
 
+  /**
+   * Normalizes accuracy values to a 0-100 percentage.
+   * @param value Accuracy as 0-1 or 0-100.
+   */
+  getAccuracyPercent(value: number): number {
+    if (!Number.isFinite(value)) {
+      return 0;
+    }
+    const normalized = value > 1 ? value : value * 100;
+    return Math.max(0, Math.min(100, normalized));
+  }
+
   /** Starts a fresh session and resets local state. */
   restart(): void {
     this.startSession();
@@ -116,13 +135,10 @@ export class DeckQuickLearnComponent implements OnInit {
 
   /** Navigates back to the deck detail screen. */
   goBack(): void {
-    if (this.session) {
-      this.router.navigate(['/decks', this.session.deckId]);
-      return;
-    }
     this.router.navigate(['/my-decks']);
   }
 
+  /** Starts a new session and initializes local state. */
   private startSession(): void {
     const deckId = Number(this.route.snapshot.paramMap.get('id'));
     if (!deckId) {
@@ -136,8 +152,16 @@ export class DeckQuickLearnComponent implements OnInit {
     this.index = 0;
     this.showAnswer = false;
 
-    this.quickLearnService.startSession(deckId).subscribe({
+    this.authService.checkAuthStatus().pipe(
+      switchMap(() => this.quickLearnService.startSession(deckId))
+    ).subscribe({
       next: (session) => {
+        if (!session) {
+          this.session = null;
+          this.cards = [];
+          this.loading = false;
+          return;
+        }
         this.session = session;
         this.cards = session.cards ?? [];
         this.loading = false;
