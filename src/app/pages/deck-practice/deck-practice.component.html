@@ -1,0 +1,139 @@
+<section class="mx-auto w-full max-w-4xl px-4 py-10 text-text" *ngIf="!initialLoading">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.deckPractice.practiceLabel }}</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ deck?.name || text.deckPractice.fallbackDeckName }}</h1>
+      <p class="mt-1 text-sm text-text-muted" *ngIf="deck">
+        {{ deck.cardCount }} {{ text.deckPractice.cardsLabel }} | {{ deck.isPublic ? text.deckPractice.publicLabel : text.deckPractice.privateLabel }}
+      </p>
+    </div>
+    <button
+      class="btn-ghost inline-flex items-center gap-2 border border-border-subtle bg-surface-card px-3 py-2 text-xs uppercase tracking-[0.25em] text-text"
+      type="button"
+      (click)="exit()"
+    >
+      <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+      {{ text.deckPractice.backToDecks }}
+    </button>
+  </div>
+
+  <div class="mt-6 flex flex-wrap items-center gap-3">
+    <button
+      class="btn-ghost px-3 py-2 text-xs uppercase tracking-[0.2em]"
+      type="button"
+      (click)="toggleRandomOrder()"
+    >
+      {{ randomOrder ? text.deckPractice.randomOrderOn : text.deckPractice.randomOrderOff }}
+    </button>
+    <button
+      class="btn-ghost px-3 py-2 text-xs uppercase tracking-[0.2em]"
+      type="button"
+      (click)="shuffleNow()"
+    >
+      {{ text.deckPractice.shuffle }}
+    </button>
+    <div
+      class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2"
+      *ngIf="availableTags.length > 0"
+    >
+      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.tagLabel }}</span>
+      <select
+        class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+        [(ngModel)]="selectedTag"
+        (ngModelChange)="onFiltersChange()"
+        [attr.aria-label]="text.deckPractice.tagAriaLabel"
+      >
+        <option [ngValue]="null">{{ text.deckPractice.allTags }}</option>
+        <option *ngFor="let tag of availableTags" [ngValue]="tag">
+          {{ tag }}
+        </option>
+      </select>
+    </div>
+    <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.difficultyLabel }}</span>
+      <select
+        class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+        [(ngModel)]="selectedDifficulty"
+        (ngModelChange)="onFiltersChange()"
+        [attr.aria-label]="text.deckPractice.difficultyAriaLabel"
+      >
+        <option [ngValue]="null">{{ text.deckPractice.difficultyAll }}</option>
+        <option [ngValue]="1">{{ text.deckPractice.difficultyLow }}</option>
+        <option [ngValue]="2">{{ text.deckPractice.difficultyMedium }}</option>
+        <option [ngValue]="3">{{ text.deckPractice.difficultyHard }}</option>
+      </select>
+    </div>
+    <span class="text-xs text-text-muted">{{ displayCards.length }} / {{ cards.length }} {{ text.deckPractice.countLabel }}</span>
+  </div>
+
+  <div class="mt-10" *ngIf="currentCard; else emptyState">
+    <div class="flip-card" [class.is-flipped]="showAnswer">
+      <div class="flip-card__inner">
+        <div
+          class="flip-card__face flip-card__face--front surface-card border-2"
+          [ngClass]="getDifficultyBorderClass(currentCard.difficulty)"
+        >
+          <div class="text-xs uppercase tracking-[0.3em] text-text-muted">
+            {{ text.deckPractice.cardLabel }} {{ index + 1 }} / {{ displayCards.length }}
+          </div>
+          <h2 class="mt-4 text-2xl font-semibold text-text">{{ currentCard.question }}</h2>
+          <p class="mt-4 text-sm text-text-muted">{{ text.deckPractice.tapToFlip }}</p>
+        </div>
+
+        <div
+          class="flip-card__face flip-card__face--back surface-card border-2"
+          [ngClass]="getDifficultyBorderClass(currentCard.difficulty)"
+        >
+          <div class="text-xs uppercase tracking-[0.3em] text-text-muted">
+            {{ text.deckPractice.answerLabel }}
+          </div>
+          <h2 class="mt-4 text-2xl font-semibold text-text">{{ currentCard.answer }}</h2>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="toggleAnswer()"
+      >
+        {{ showAnswer ? text.deckPractice.hideAnswer : text.deckPractice.showAnswer }}
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="prevCard()"
+        [disabled]="index === 0"
+      >
+        {{ text.deckPractice.prev }}
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="nextCard()"
+        [disabled]="index === displayCards.length - 1"
+      >
+        {{ text.deckPractice.next }}
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        (click)="restart()"
+      >
+        {{ text.deckPractice.restart }}
+      </button>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="mt-10 flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted">
+      <span *ngIf="cards.length === 0; else noMatches">{{ text.deckPractice.emptyDeck }}</span>
+      <ng-template #noMatches>{{ text.deckPractice.noMatches }}</ng-template>
+    </div>
+  </ng-template>
+</section>
+
+<div class="app-loading-overlay" *ngIf="initialLoading">
+  <div class="app-loading-spinner" [attr.aria-label]="text.common.loadingAriaLabel"></div>
+</div>

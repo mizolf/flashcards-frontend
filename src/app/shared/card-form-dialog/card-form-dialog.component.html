@@ -1,1 +1,80 @@
-<p>card-form-dialog works!</p>
+<p-dialog
+  [header]="card ? 'Edit card' : 'New card'"
+  [modal]="true"
+  [draggable]="false"
+  [resizable]="false"
+  [(visible)]="visible"
+  (onHide)="close()"
+  styleClass="rounded-2xl"
+>
+  <div class="flex flex-col gap-4 text-slate-800">
+    <div class="flex flex-col gap-2">
+      <label for="card-question" class="text-sm font-medium text-slate-700">Question</label>
+      <textarea
+        pInputTextarea
+        id="card-question"
+        name="cardQuestion"
+        rows="3"
+        placeholder="Enter question"
+        [(ngModel)]="question"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="card-answer" class="text-sm font-medium text-slate-700">Answer</label>
+      <textarea
+        pInputTextarea
+        id="card-answer"
+        name="cardAnswer"
+        rows="3"
+        placeholder="Enter answer"
+        [(ngModel)]="answer"
+        class="w-full"
+      ></textarea>
+    </div>
+
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-2">
+        <label for="card-tag" class="text-sm font-medium text-slate-700">Tag</label>
+        <input
+          pInputText
+          id="card-tag"
+          name="cardTag"
+          placeholder="e.g. grammar"
+          [(ngModel)]="tag"
+          class="w-full"
+        />
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="card-difficulty" class="text-sm font-medium text-slate-700">Difficulty</label>
+        <select
+          id="card-difficulty"
+          name="cardDifficulty"
+          [(ngModel)]="difficulty"
+          class="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 shadow-sm focus:border-slate-400 focus:outline-none"
+        >
+          <option [ngValue]="null">Select difficulty</option>
+          <option *ngFor="let option of visibleDifficultyOptions" [ngValue]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <div class="flex items-center justify-end gap-2">
+      <button pButton type="button" class="p-button-text" label="Cancel" (click)="close()"></button>
+      <button
+        pButton
+        type="button"
+        label="Save"
+        [loading]="saving"
+        [disabled]="saving || !question.trim() || !answer.trim()"
+        (click)="submit()"
+      ></button>
+    </div>
+  </ng-template>
+</p-dialog>

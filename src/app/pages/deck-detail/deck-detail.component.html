@@ -1,1 +1,165 @@
-<p>deck-detail works!</p>
+<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text" *ngIf="!initialLoading && deck">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <button
+        class="btn-ghost inline-flex items-center gap-2 border border-border-subtle bg-surface-card px-3 py-2 text-xs uppercase tracking-[0.25em] text-text"
+        type="button"
+        (click)="goBack()"
+      >
+        <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+        {{ text.deckDetail.backToDecks }}
+      </button>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ text.deckDetail.manageTitle }}</h1>
+      <p class="mt-1 text-sm text-text-muted">
+        {{ deck.cardCount }} {{ text.deckDetail.cardsLabel }} | {{ deck.ownerUsername }}
+      </p>
+    </div>
+    <button
+      pButton
+      type="button"
+      [label]="text.deckDetail.newCard"
+      icon="pi pi-plus"
+      (click)="openCardDialog()"
+    ></button>
+  </div>
+
+  <div class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1.95fr]">
+    <div class="surface-panel p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text">{{ text.deckDetail.detailsTitle }}</h2>
+          <p class="mt-1 text-sm text-text-muted">{{ text.deckDetail.detailsSubtitle }}</p>
+        </div>
+        <span class="rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
+          {{ text.deckDetail.settingsBadge }}
+        </span>
+      </div>
+
+      <div class="mt-5 flex flex-col gap-4">
+        <div class="flex flex-col gap-2">
+          <label for="deck-name" class="text-sm font-medium text-text">{{ text.deckDetail.nameLabel }}</label>
+          <input
+            pInputText
+            id="deck-name"
+            name="deckName"
+            [placeholder]="text.deckDetail.namePlaceholder"
+            [(ngModel)]="deckName"
+            class="w-full"
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <p-checkbox inputId="deck-public" [binary]="true" [(ngModel)]="deckIsPublic"></p-checkbox>
+          <label for="deck-public" class="text-sm text-text-muted">{{ text.deckDetail.publicLabel }}</label>
+        </div>
+
+        <button
+          class="btn-primary disabled:opacity-60"
+          type="button"
+          [disabled]="saving || !deckName.trim()"
+          (click)="saveDeck()"
+        >
+          {{ saving ? text.deckDetail.saving : text.deckDetail.saveChanges }}
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <div class="mb-4 flex flex-wrap items-center gap-2" *ngIf="availableTags.length > 0">
+        <span class="text-xs uppercase tracking-[0.2em] text-text-muted">{{ text.deckDetail.filterLabel }}</span>
+        <button
+          class="btn-ghost px-3 py-1 text-xs"
+          type="button"
+          [ngClass]="{ 'bg-surface-soft text-text': !selectedTag }"
+          (click)="selectTag(null)"
+        >
+          {{ text.deckDetail.filterAll }}
+        </button>
+        <button
+          class="btn-ghost px-3 py-1 text-xs"
+          type="button"
+          *ngFor="let tag of availableTags"
+          [ngClass]="{ 'bg-surface-soft text-text': selectedTag === tag }"
+          (click)="selectTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div
+          class="surface-card border-2 p-5 transition hover:-translate-y-0.5 hover:shadow-cardHover"
+          [ngClass]="getDifficultyBorderClass(card.difficulty)"
+          *ngFor="let card of filteredCards"
+        >
+          <div class="flex flex-wrap items-start justify-between gap-2">
+            <h3 class="break-words text-lg font-semibold text-text">{{ card.question }}</h3>
+            <span class="rounded-full bg-surface-soft px-2 py-1 text-xs text-text-muted">
+              {{ card.tag || text.deckDetail.generalTag }}
+            </span>
+          </div>
+          <p class="mt-3 break-words text-sm text-text-muted">{{ card.answer }}</p>
+          <div class="mt-4 flex flex-wrap items-center justify-between gap-3 text-xs text-text-muted">
+            <span>{{ text.deckDetail.difficultyLabel }} {{ getDifficultyLabel(card.difficulty) }}</span>
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                class="btn-ghost px-3 py-1"
+                type="button"
+                (click)="openCardDialog(card)"
+              >
+                {{ text.deckDetail.edit }}
+              </button>
+              <button
+                class="btn-ghost border-rose-200 px-3 py-1 text-rose-600 hover:bg-rose-50"
+                type="button"
+                (click)="deleteCard(card)"
+              >
+                {{ text.deckDetail.delete }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div
+          class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
+          *ngIf="filteredCards.length === 0"
+        >
+          {{ text.deckDetail.emptyCards }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="app-loading-overlay" *ngIf="initialLoading || refreshing">
+  <div class="app-loading-spinner" [attr.aria-label]="text.common.loadingAriaLabel"></div>
+</div>
+
+<app-card-form-dialog
+  [(visible)]="showCardDialog"
+  [saving]="cardSaving"
+  [card]="editingCard"
+  (save)="saveCard($event)"
+></app-card-form-dialog>
+
+<div class="app-loading-overlay" *ngIf="showDeleteDialog">
+  <div class="surface-card w-full max-w-md p-6 text-text shadow-card">
+    <h3 class="text-lg font-semibold text-text">{{ text.deckDetail.deleteCardTitle }}</h3>
+    <p class="mt-2 text-sm text-text-muted">
+      {{ text.deckDetail.deleteCardConfirmPrefix }}{{ pendingDeleteCard?.question }}{{ text.deckDetail.deleteCardConfirmSuffix }}
+    </p>
+    <div class="mt-5 flex items-center justify-end gap-2">
+      <button class="btn-ghost" type="button" [disabled]="cardDeleting" (click)="cancelDeleteCard()">
+        {{ text.deckDetail.cancel }}
+      </button>
+      <button
+        pButton
+        type="button"
+        [label]="text.deckDetail.delete"
+        [loading]="cardDeleting"
+        [disabled]="cardDeleting"
+        (click)="confirmDeleteCard()"
+      ></button>
+    </div>
+  </div>
+</div>
