@@ -1,1 +1,65 @@
-<p>profile works!</p>
+<section class="mx-auto w-full max-w-4xl px-4 py-10 text-text" *ngIf="!loading">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">Account</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">My Profile</h1>
+      <p class="mt-1 text-sm text-text-muted">Your account details and status.</p>
+    </div>
+  </div>
+
+  <ng-container *ngIf="isAuthenticated; else loggedOut">
+    <div class="mt-8 surface-panel p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-semibold text-text">Profile details</h2>
+        </div>
+        <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          Active
+        </span>
+      </div>
+
+      <div class="mt-6 grid gap-4 sm:grid-cols-2">
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">Username</p>
+          <p class="mt-2 text-base font-semibold text-text">{{ (user$ | async)?.username || '—' }}</p>
+        </div>
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">Email</p>
+          <p class="mt-2 text-base font-semibold text-text">{{ (user$ | async)?.email || '—' }}</p>
+        </div>
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">Status</p>
+          <p class="mt-2 text-base font-semibold text-text">
+            <span class="inline-flex items-center gap-2 text-emerald-600" *ngIf="(user$ | async)?.enabled; else pendingVerification">
+              <i class="pi pi-check-circle text-emerald-500" aria-hidden="true"></i>
+              Verified
+            </span>
+            <ng-template #pendingVerification>Pending verification</ng-template>
+          </p>
+        </div>
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">User ID</p>
+          <p class="mt-2 text-base font-semibold text-text">{{ (user$ | async)?.id || '—' }}</p>
+        </div>
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">Decks created</p>
+          <p class="mt-2 text-base font-semibold text-text">{{ deckCount }}</p>
+        </div>
+        <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+          <p class="text-xs uppercase tracking-[0.25em] text-text-muted">Total cards</p>
+          <p class="mt-2 text-base font-semibold text-text">{{ cardCount }}</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <ng-template #loggedOut>
+    <div class="mt-8 flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted">
+      No authenticated user found. Please log in again.
+    </div>
+  </ng-template>
+</section>
+
+<div class="app-loading-overlay" *ngIf="loading">
+  <div class="app-loading-spinner" aria-label="Loading"></div>
+</div>
