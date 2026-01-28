@@ -94,6 +94,24 @@ export const UI_TEXT = {
     emptyDeck: 'No cards in this deck yet.',
     noMatches: 'No cards match the selected filters.'
   },
+  quickLearn: {
+    label: 'Quick learn',
+    backToDeck: 'Back to deck',
+    startOver: 'Start over',
+    showAnswer: 'Show answer',
+    hideAnswer: 'Hide answer',
+    correct: 'Correct',
+    incorrect: 'Incorrect',
+    submit: 'Submit results',
+    noCards: 'No cards available for quick learn.',
+    sessionStats: 'Session stats',
+    deckStats: 'Deck stats',
+    totalCards: 'Total cards',
+    correctCount: 'Correct',
+    incorrectCount: 'Incorrect',
+    accuracy: 'Accuracy',
+    cardsStudied: 'Cards studied',
+    overallAccuracy: 'Overall accuracy'
   home: {
     sectionLabel: 'Public decks',
     title: 'Learn from community collections',

@@ -1,0 +1,125 @@
+<section class="mx-auto w-full max-w-4xl px-4 py-10 text-text" *ngIf="!loading">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.quickLearn.label }}</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ session?.deckName || text.deckPractice.fallbackDeckName }}</h1>
+      <p class="mt-1 text-sm text-text-muted" *ngIf="session">
+        {{ session.cards.length }} / {{ session.totalCardsInDeck }} {{ text.deckPractice.cardsLabel }}
+      </p>
+    </div>
+    <button
+      class="btn-ghost inline-flex items-center gap-2 border border-border-subtle bg-surface-card px-3 py-2 text-xs uppercase tracking-[0.25em] text-text"
+      type="button"
+      (click)="goBack()"
+    >
+      <i class="pi pi-arrow-left text-xs" aria-hidden="true"></i>
+      {{ text.quickLearn.backToDeck }}
+    </button>
+  </div>
+
+  <div class="mt-6 flex flex-wrap items-center gap-3" *ngIf="session">
+    <button class="btn-ghost px-3 py-2 text-xs uppercase tracking-[0.2em]" type="button" (click)="restart()">
+      {{ text.quickLearn.startOver }}
+    </button>
+    <span class="text-xs text-text-muted">{{ answeredCount }} / {{ cards.length }} {{ text.deckPractice.countLabel }}</span>
+  </div>
+
+  <div class="mt-10" *ngIf="currentCard && !results; else resultsState">
+    <div class="surface-card border-2 border-border-subtle p-6">
+      <div class="text-xs uppercase tracking-[0.3em] text-text-muted">
+        {{ text.deckPractice.cardLabel }} {{ index + 1 }} / {{ cards.length }}
+      </div>
+      <h2 class="mt-4 text-2xl font-semibold text-text">{{ currentCard.question }}</h2>
+      <p class="mt-4 text-sm text-text-muted" *ngIf="!showAnswer">{{ text.deckPractice.tapToFlip }}</p>
+      <div class="mt-4 rounded-2xl border border-dashed border-border-subtle bg-surface-card p-4" *ngIf="showAnswer">
+        <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.deckPractice.answerLabel }}</p>
+        <p class="mt-2 text-lg font-semibold text-text">{{ currentCard.answer }}</p>
+      </div>
+    </div>
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <button class="btn-primary" type="button" (click)="toggleAnswer()">
+        {{ showAnswer ? text.quickLearn.hideAnswer : text.quickLearn.showAnswer }}
+      </button>
+      <button class="btn-ghost" type="button" (click)="markAnswer(true)">
+        {{ text.quickLearn.correct }}
+      </button>
+      <button class="btn-ghost border-rose-200 text-rose-600 hover:bg-rose-50" type="button" (click)="markAnswer(false)">
+        {{ text.quickLearn.incorrect }}
+      </button>
+      <button
+        class="btn-ghost"
+        type="button"
+        [disabled]="!isComplete || submitting"
+        (click)="submitResults()"
+        *ngIf="isComplete"
+      >
+        {{ submitting ? text.deckDetail.saving : text.quickLearn.submit }}
+      </button>
+    </div>
+  </div>
+
+  <ng-template #resultsState>
+    <div class="mt-10" *ngIf="results; else emptyState">
+      <div class="surface-panel p-6">
+        <h2 class="text-lg font-semibold text-text">{{ text.quickLearn.sessionStats }}</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.totalCards }}</p>
+            <p class="mt-2 text-base font-semibold text-text">{{ results.sessionStats.totalCards }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.correctCount }}</p>
+            <p class="mt-2 text-base font-semibold text-emerald-600">{{ results.sessionStats.correctCount }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.incorrectCount }}</p>
+            <p class="mt-2 text-base font-semibold text-rose-600">{{ results.sessionStats.incorrectCount }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.accuracy }}</p>
+            <p class="mt-2 text-base font-semibold text-text">{{ getAccuracyPercent(results.sessionStats.accuracy) | number:'1.0-0' }}%</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 surface-panel p-6">
+        <h2 class="text-lg font-semibold text-text">{{ text.quickLearn.deckStats }}</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.totalCards }}</p>
+            <p class="mt-2 text-base font-semibold text-text">{{ results.deckStats.totalCardsInDeck }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.cardsStudied }}</p>
+            <p class="mt-2 text-base font-semibold text-text">{{ results.deckStats.cardsStudied }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.correctCount }}</p>
+            <p class="mt-2 text-base font-semibold text-emerald-600">{{ results.deckStats.totalCorrect }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.incorrectCount }}</p>
+            <p class="mt-2 text-base font-semibold text-rose-600">{{ results.deckStats.totalIncorrect }}</p>
+          </div>
+          <div class="rounded-2xl border border-border-subtle bg-surface-card p-4 sm:col-span-2">
+            <p class="text-xs uppercase tracking-[0.25em] text-text-muted">{{ text.quickLearn.overallAccuracy }}</p>
+            <p class="mt-2 text-base font-semibold text-text">
+              {{ getAccuracyPercent(results.deckStats.overallAccuracy) | number:'1.0-0' }}%
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+
+  <ng-template #emptyState>
+    <div class="mt-10 flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted">
+      {{ text.quickLearn.noCards }}
+    </div>
+  </ng-template>
+</section>
+
+<div class="app-loading-overlay" *ngIf="loading">
+  <div class="app-loading-spinner" [attr.aria-label]="text.common.loadingAriaLabel"></div>
+</div>

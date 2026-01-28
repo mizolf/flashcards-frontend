@@ -7,6 +7,7 @@ import { HomeComponent } from './pages/home/home.component';
 import { MyDecksComponent } from './pages/my-decks/my-decks.component';
 import { DeckDetailComponent } from './pages/deck-detail/deck-detail.component';
 import { DeckPracticeComponent } from './pages/deck-practice/deck-practice.component';
+import { DeckQuickLearnComponent } from './pages/deck-quick-learn/deck-quick-learn.component';
 import { ProfileComponent } from './pages/profile/profile.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
 
@@ -24,6 +25,7 @@ export const routes: Routes = [
         { path: 'home', component: HomeComponent },
         { path: 'my-decks', component: MyDecksComponent },
         { path: 'decks/:id/practice', component: DeckPracticeComponent },
+        { path: 'decks/:id/learn', component: DeckQuickLearnComponent },
         { path: 'decks/:id', component: DeckDetailComponent },
         { path: 'profile', component: ProfileComponent },
         { path: '', redirectTo: 'home', pathMatch: 'full' }
