@@ -112,5 +112,55 @@ export const UI_TEXT = {
     accuracy: 'Accuracy',
     cardsStudied: 'Cards studied',
     overallAccuracy: 'Overall accuracy'
+  home: {
+    sectionLabel: 'Public decks',
+    title: 'Learn from community collections',
+    subtitle: 'Pick a deck by topic, size, or card count and start learning.',
+    searchPlaceholder: 'Search by deck name',
+    reset: 'Reset',
+    sortLabel: 'Sort',
+    sortOptions: {
+      newest: 'Newest',
+      oldest: 'Oldest',
+      mostCards: 'Most cards',
+      leastCards: 'Least cards',
+      nameAZ: 'Name A–Z',
+      nameZA: 'Name Z–A'
+    },
+    sizeLabel: 'Deck size',
+    sizeOptions: {
+      all: 'All decks',
+      small: 'Small (1 - 20)',
+      medium: 'Medium (21 - 60)',
+      large: 'Large (61+)',
+      empty: 'Empty (0)'
+    },
+    minCardsLabel: 'Minimum cards',
+    minCardsPlaceholder: 'e.g. 10',
+    showingPrefix: 'Showing',
+    showingMiddle: 'of',
+    showingSuffix: 'decks',
+    activeFilters: 'Active filters',
+    nameFilterPrefix: 'Name:',
+    sizeFilterPrefix: 'Size:',
+    minCardsFilterPrefix: 'Min cards:',
+    errorMessage: 'We could not load public decks right now. Please try again.',
+    retry: 'Try again',
+    emptyTitle: 'No decks to show',
+    emptyBody: 'Try changing filters or resetting the search.',
+    resetFilters: 'Reset filters',
+    createdLabel: 'Created',
+    cardsLabel: 'cards',
+    emptyDeckLabel: 'Empty deck',
+    readyLabel: 'Ready to learn',
+    publicBadge: 'Public',
+    play: 'Play',
+    sizeLabels: {
+      all: 'All',
+      small: 'Small',
+      medium: 'Medium',
+      large: 'Large',
+      empty: 'Empty'
+    }
   }
 } as const;

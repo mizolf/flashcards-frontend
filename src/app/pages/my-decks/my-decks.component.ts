@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { ButtonModule } from 'primeng/button';
-import { catchError, forkJoin, map, of } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 import { CreateDeckRequest, DeckResponse } from '../../models/Deck.dto';
 import { CardResponse } from '../../models/Card.dto';
@@ -97,7 +97,7 @@ export class MyDecksComponent implements OnInit {
       this.showNoCardsDialog = true;
       return;
     }
-    this.router.navigate(['/decks', deck.id, 'practice']);
+    this.router.navigate(['/decks', deck.id, 'practice'], { queryParams: { origin: 'my-decks' } });
   }
 
   /**
@@ -244,18 +244,24 @@ export class MyDecksComponent implements OnInit {
     } else {
       this.refreshing = true;
     }
-    this.deckService.getDecks().subscribe({
-      next: (decks) => {
-        this.decks = decks;
-        this.updateDifficultyAverages(decks);
-        this.initialLoading = false;
-        this.refreshing = false;
-      },
-      error: () => {
-        this.initialLoading = false;
-        this.refreshing = false;
-      }
-    });
+    this.deckService.getDecks()
+      .pipe(
+        switchMap((decks) => {
+          this.decks = decks;
+          return this.loadDifficultyAverages(decks);
+        })
+      )
+      .subscribe({
+        next: (difficultyByDeckId) => {
+          this.difficultyByDeckId = difficultyByDeckId;
+          this.initialLoading = false;
+          this.refreshing = false;
+        },
+        error: () => {
+          this.initialLoading = false;
+          this.refreshing = false;
+        }
+      });
   }
 
   /**
@@ -264,11 +270,10 @@ export class MyDecksComponent implements OnInit {
    */
   private updateDifficultyAverages(decks: DeckResponse[]): void {
     if (decks.length === 0) {
-      this.difficultyByDeckId = {};
-      return;
+      return of({});
     }
 
-    forkJoin(
+    return forkJoin(
       decks.map((deck) =>
         this.deckService.getDeckById(deck.id).pipe(
           map((detail) => ({
@@ -278,13 +283,15 @@ export class MyDecksComponent implements OnInit {
           catchError(() => of({ id: deck.id, avg: null }))
         )
       )
-    ).subscribe((results) => {
+    ).pipe(
+      map((results) => {
       const next: Record<number, number | null> = {};
       results.forEach((result) => {
         next[result.id] = result.avg;
       });
-      this.difficultyByDeckId = next;
-    });
+      return next;
+    })
+    );
   }
 
   /**
