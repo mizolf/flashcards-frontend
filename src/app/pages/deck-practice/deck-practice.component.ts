@@ -107,6 +107,15 @@ export class DeckPracticeComponent implements OnInit {
 
   /** Navigates back to My Decks. */
   exit(): void {
+    const origin = this.route.snapshot.queryParamMap.get('origin');
+    if (origin === 'home') {
+      this.router.navigate(['/home']);
+      return;
+    }
+    if (origin === 'my-decks') {
+      this.router.navigate(['/my-decks']);
+      return;
+    }
     this.router.navigate(['/my-decks']);
   }
 
@@ -131,11 +140,13 @@ export class DeckPracticeComponent implements OnInit {
       return;
     }
 
+    const quickMode = this.route.snapshot.queryParamMap.get('quick') === '1';
     this.initialLoading = true;
     this.deckService.getDeckById(deckId).subscribe({
       next: (deck) => {
         this.deck = deck;
         this.cards = deck.cards ?? [];
+        this.randomOrder = quickMode;
         this.updateAvailableTags(this.cards);
         this.applyFilters(true);
         this.initialLoading = false;

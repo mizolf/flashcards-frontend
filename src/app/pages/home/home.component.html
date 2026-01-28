@@ -1,1 +1,183 @@
-<p>home works!</p>
+<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.home.sectionLabel }}</p>
+      <h1 class="mt-2 text-3xl font-semibold text-text">{{ text.home.title }}</h1>
+      <p class="mt-1 text-sm text-text-muted">{{ text.home.subtitle }}</p>
+    </div>
+    <div class="flex w-full max-w-md flex-wrap items-center gap-2 sm:w-auto">
+      <div class="relative flex-1">
+        <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"></i>
+        <input
+          type="text"
+          class="w-full rounded-full border border-border bg-surface-card py-2 pl-9 pr-4 text-sm text-text outline-none transition focus:border-border-subtle"
+          [placeholder]="text.home.searchPlaceholder"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="applyFilters()" />
+      </div>
+      <button
+        class="btn-ghost"
+        type="button"
+        [disabled]="!hasActiveFilters()"
+        (click)="clearFilters()">
+        {{ text.home.reset }}
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-8 space-y-6" *ngIf="!isLoading">
+    <div class="flex flex-wrap items-center gap-3">
+      <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">
+          {{ text.home.sortLabel }}
+        </span>
+        <select
+          class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [(ngModel)]="sortBy"
+          (ngModelChange)="applyFilters()">
+          <option value="newest">{{ text.home.sortOptions.newest }}</option>
+          <option value="oldest">{{ text.home.sortOptions.oldest }}</option>
+          <option value="mostCards">{{ text.home.sortOptions.mostCards }}</option>
+          <option value="leastCards">{{ text.home.sortOptions.leastCards }}</option>
+          <option value="nameAZ">{{ text.home.sortOptions.nameAZ }}</option>
+          <option value="nameZA">{{ text.home.sortOptions.nameZA }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">
+          {{ text.home.sizeLabel }}
+        </span>
+        <select
+          class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [(ngModel)]="sizeFilter"
+          (ngModelChange)="applyFilters()">
+          <option value="all">{{ text.home.sizeOptions.all }}</option>
+          <option value="small">{{ text.home.sizeOptions.small }}</option>
+          <option value="medium">{{ text.home.sizeOptions.medium }}</option>
+          <option value="large">{{ text.home.sizeOptions.large }}</option>
+          <option value="empty">{{ text.home.sizeOptions.empty }}</option>
+        </select>
+      </div>
+
+      <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">
+          {{ text.home.minCardsLabel }}
+        </span>
+        <input
+          type="number"
+          min="0"
+          class="w-20 bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [placeholder]="text.home.minCardsPlaceholder"
+          [(ngModel)]="minCards"
+          (ngModelChange)="onMinCardsChange($event)" />
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 text-xs text-text-muted">
+      <span>
+        {{ text.home.showingPrefix }} {{ filteredDecks.length }}
+        {{ text.home.showingMiddle }} {{ publicDecks.length }} {{ text.home.showingSuffix }}
+      </span>
+      @if (hasActiveFilters()) {
+        <span class="rounded-full border border-border-subtle bg-surface-soft px-3 py-1 text-text-muted">
+          {{ text.home.activeFilters }}
+        </span>
+      }
+      @if (searchTerm.trim().length > 0) {
+        <span class="rounded-full border border-border-subtle bg-surface-soft px-3 py-1 text-text-muted">
+          {{ text.home.nameFilterPrefix }} "{{ searchTerm }}"
+        </span>
+      }
+      @if (sizeFilter !== 'all') {
+        <span class="rounded-full border border-border-subtle bg-surface-soft px-3 py-1 text-text-muted">
+          {{ text.home.sizeFilterPrefix }} {{ sizeFilterLabel() }}
+        </span>
+      }
+      @if (minCards) {
+        <span class="rounded-full border border-border-subtle bg-surface-soft px-3 py-1 text-text-muted">
+          {{ text.home.minCardsFilterPrefix }} {{ minCards }}
+        </span>
+      }
+    </div>
+
+    @if (errorMessage) {
+      <div class="surface-card p-6 text-sm text-text">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <span>{{ errorMessage }}</span>
+          <button class="btn-ghost" type="button" (click)="loadDecks()">
+            {{ text.home.retry }}
+          </button>
+        </div>
+      </div>
+    } @else {
+      <section>
+        <div class="mb-4 flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-semibold text-text">{{ text.home.sectionLabel }}</h2>
+            <p class="text-xs text-text-muted">{{ text.home.subtitle }}</p>
+          </div>
+          <span class="text-sm text-text-muted">
+            {{ filteredDecks.length }} {{ text.home.showingSuffix }}
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div class="relative" *ngFor="let deck of filteredDecks; let i = index">
+            <div
+              class="group relative overflow-hidden rounded-2xl border border-white/10 bg-slate-900/90 text-white shadow-lg transition hover:-translate-y-1 hover:shadow-cardHover"
+            >
+              <div
+                class="absolute inset-0 bg-gradient-to-br opacity-90"
+                [ngClass]="getDeckGradient(deck)"
+              ></div>
+              <div class="relative flex h-full flex-col gap-5 p-5">
+                <div class="flex items-start justify-between gap-3">
+                  <h3 class="text-lg font-semibold leading-snug">{{ deck.name }}</h3>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="rounded-full bg-white/15 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white/90">
+                    {{ text.home.publicBadge }}
+                  </span>
+                  <span class="text-sm text-white/90">{{ deck.cardCount }} {{ text.home.cardsLabel }}</span>
+                </div>
+                <div class="text-xs text-white/80">
+                  {{ text.home.createdLabel }} {{ deck.createdAt | date: 'MM/dd/yyyy' }}
+                </div>
+                <div class="mt-auto flex flex-wrap items-center gap-2">
+                  <button
+                    class="btn-primary"
+                    type="button"
+                    [class.opacity-60]="deck.cardCount === 0"
+                    [class.cursor-not-allowed]="deck.cardCount === 0"
+                    [attr.aria-disabled]="deck.cardCount === 0"
+                    (click)="play(deck)">
+                    {{ text.home.play }}
+                  </button>
+                  <span class="text-xs uppercase tracking-[0.25em] text-white/70">
+                    @if (deck.cardCount === 0) {
+                      {{ text.home.emptyDeckLabel }}
+                    } @else {
+                      {{ text.home.readyLabel }}
+                    }
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="flex items-center justify-center rounded-2xl border border-dashed border-border-subtle bg-surface-card p-6 text-text-muted"
+            *ngIf="filteredDecks.length === 0"
+          >
+            {{ text.home.emptyTitle }}
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+</section>
+
+<div class="app-loading-overlay" *ngIf="isLoading">
+  <div class="app-loading-spinner" [attr.aria-label]="text.common.loadingAriaLabel"></div>
+</div>
