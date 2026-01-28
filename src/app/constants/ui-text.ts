@@ -111,7 +111,8 @@ export const UI_TEXT = {
     incorrectCount: 'Incorrect',
     accuracy: 'Accuracy',
     cardsStudied: 'Cards studied',
-    overallAccuracy: 'Overall accuracy'
+    overallAccuracy: 'Overall accuracy',
+  },
   home: {
     sectionLabel: 'Public decks',
     title: 'Learn from community collections',

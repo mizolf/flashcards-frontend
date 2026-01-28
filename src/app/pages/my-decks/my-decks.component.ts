@@ -268,7 +268,7 @@ export class MyDecksComponent implements OnInit {
    * Calculates per-deck average difficulty for gradient coloring.
    * @param decks Deck list used to fetch card details.
    */
-  private updateDifficultyAverages(decks: DeckResponse[]): void {
+  private loadDifficultyAverages(decks: DeckResponse[]): Observable<Record<number, number | null>> {
     if (decks.length === 0) {
       return of({});
     }
