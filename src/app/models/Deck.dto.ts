@@ -11,7 +11,8 @@ export interface DeckResponse {
   isPublic: boolean;
   createdAt: string;
   cardCount: number;
-  ownerUsername?: string;
+  ownerUsername: string;
+  averageDifficulty: number | null;
 }
 
 export interface DeckDetailResponse {

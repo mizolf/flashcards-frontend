@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaginatorModule } from 'primeng/paginator';
 
 import { UI_TEXT } from '../../constants/ui-text';
 import { DeckResponse } from '../../models/Deck.dto';
+import { PaginationParams } from '../../models/Page.dto';
 import { DeckService } from '../../services/deck.service';
-import { UserService } from '../../services/user.service';
-import { catchError, forkJoin, map, of, switchMap } from 'rxjs';
 
 type SizeFilter = 'all' | 'small' | 'medium' | 'large' | 'empty';
 type SortBy = 'newest' | 'oldest' | 'mostCards' | 'leastCards' | 'nameAZ' | 'nameZA';
@@ -15,7 +15,7 @@ type SortBy = 'newest' | 'oldest' | 'mostCards' | 'leastCards' | 'nameAZ' | 'nam
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginatorModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
 })
@@ -34,9 +34,15 @@ export class HomeComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
 
+  /** Current page number (0-indexed). */
+  currentPage = 0;
+  /** Number of decks per page. */
+  pageSize = 9;
+  /** Total number of decks across all pages. */
+  totalElements = 0;
+
   constructor(
     private deckService: DeckService,
-    private userService: UserService,
     private router: Router
   ) {}
 
@@ -47,108 +53,102 @@ export class HomeComponent implements OnInit {
   loadDecks(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    forkJoin({
-      user: this.userService.getAuthenticatedUser().pipe(catchError(() => of(null))),
-      decks: this.deckService.getPublicDecks()
-    })
-      .pipe(
-        switchMap(({ user, decks }) => {
-          const username = user?.username ?? null;
-          if (!username) {
-            return of(decks ?? []);
-          }
 
-          const withOwner = (decks ?? []).filter((deck) => !!deck.ownerUsername);
-          const withoutOwner = (decks ?? []).filter((deck) => !deck.ownerUsername);
-          const filteredWithOwner = withOwner.filter((deck) => deck.ownerUsername !== username);
+    const params: PaginationParams = {
+      page: this.currentPage,
+      size: this.pageSize,
+      ...this.getSortParams(),
+      ...this.getFilterParams()
+    };
 
-          if (withoutOwner.length === 0) {
-            return of(filteredWithOwner);
-          }
-
-          return forkJoin(
-            withoutOwner.map((deck) =>
-              this.deckService.getDeckById(deck.id).pipe(
-                map((detail) => ({ deck, ownerUsername: detail.ownerUsername })),
-                catchError(() => of({ deck, ownerUsername: null }))
-              )
-            )
-          ).pipe(
-            map((results) => {
-              const filteredWithoutOwner = results
-                .filter((result) => result.ownerUsername === null || result.ownerUsername !== username)
-                .map((result) => ({
-                  ...result.deck,
-                  ownerUsername: result.ownerUsername ?? result.deck.ownerUsername
-                }));
-              return [...filteredWithOwner, ...filteredWithoutOwner];
-            })
-          );
-        })
-      )
-      .subscribe({
-        next: (decks) => {
-          this.publicDecks = decks ?? [];
-          this.applyFilters();
-          this.isLoading = false;
-        },
-        error: () => {
-          this.errorMessage = this.text.home.errorMessage;
-          this.isLoading = false;
-        }
-      });
-  }
-
-  applyFilters(): void {
-    const term = this.searchTerm.trim().toLowerCase();
-    let decks = [...this.publicDecks];
-
-    if (term) {
-      decks = decks.filter((deck) => deck.name.toLowerCase().includes(term));
-    }
-
-    const minCards = this.minCards;
-    if (minCards !== null && minCards > 0) {
-      decks = decks.filter((deck) => deck.cardCount >= minCards);
-    }
-
-    switch (this.sizeFilter) {
-      case 'small':
-        decks = decks.filter((deck) => deck.cardCount >= 1 && deck.cardCount <= 20);
-        break;
-      case 'medium':
-        decks = decks.filter((deck) => deck.cardCount >= 21 && deck.cardCount <= 60);
-        break;
-      case 'large':
-        decks = decks.filter((deck) => deck.cardCount >= 61);
-        break;
-      case 'empty':
-        decks = decks.filter((deck) => deck.cardCount === 0);
-        break;
-      default:
-        break;
-    }
-
-    decks.sort((a, b) => {
-      switch (this.sortBy) {
-        case 'newest':
-          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        case 'oldest':
-          return new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        case 'mostCards':
-          return b.cardCount - a.cardCount;
-        case 'leastCards':
-          return a.cardCount - b.cardCount;
-        case 'nameAZ':
-          return a.name.localeCompare(b.name);
-        case 'nameZA':
-          return b.name.localeCompare(a.name);
-        default:
-          return 0;
+    this.deckService.getPublicDecks(params).subscribe({
+      next: (decksPage) => {
+        this.publicDecks = decksPage.content;
+        this.totalElements = decksPage.totalElements;
+        this.filteredDecks = [...this.publicDecks];
+        this.applySearchFilter();
+        this.isLoading = false;
+      },
+      error: () => {
+        this.errorMessage = this.text.home.errorMessage;
+        this.isLoading = false;
       }
     });
+  }
 
-    this.filteredDecks = decks;
+  /**
+   * Returns backend sort parameters based on current sort option.
+   */
+  private getSortParams(): Pick<PaginationParams, 'sortBy' | 'sortDir'> {
+    switch (this.sortBy) {
+      case 'newest':
+        return { sortBy: 'createdAt', sortDir: 'desc' };
+      case 'oldest':
+        return { sortBy: 'createdAt', sortDir: 'asc' };
+      case 'nameAZ':
+        return { sortBy: 'name', sortDir: 'asc' };
+      case 'nameZA':
+        return { sortBy: 'name', sortDir: 'desc' };
+      case 'mostCards':
+        return { sortBy: 'cardCount', sortDir: 'desc' };
+      case 'leastCards':
+        return { sortBy: 'cardCount', sortDir: 'asc' };
+      default:
+        return { sortBy: 'createdAt', sortDir: 'desc' };
+    }
+  }
+
+  /**
+   * Returns backend filter parameters based on current filter options.
+   */
+  private getFilterParams(): Pick<PaginationParams, 'sizeFilter' | 'minCards'> {
+    const params: Pick<PaginationParams, 'sizeFilter' | 'minCards'> = {};
+    if (this.sizeFilter !== 'all') {
+      params.sizeFilter = this.sizeFilter;
+    }
+    if (this.minCards !== null && this.minCards > 0) {
+      params.minCards = this.minCards;
+    }
+    return params;
+  }
+
+  /**
+   * Handles page change events from the paginator.
+   * @param event Paginator event containing page info.
+   */
+  onPageChange(event: { first?: number; rows?: number; page?: number }): void {
+    this.currentPage = event.page ?? 0;
+    this.loadDecks();
+  }
+
+  /**
+   * Handles sort option changes - resets page and reloads.
+   */
+  onSortChange(): void {
+    this.currentPage = 0;
+    this.loadDecks();
+  }
+
+  /**
+   * Handles size filter changes - resets page and reloads.
+   */
+  onSizeFilterChange(): void {
+    this.currentPage = 0;
+    this.loadDecks();
+  }
+
+  /**
+   * Applies client-side search filter on the deck name.
+   */
+  applySearchFilter(): void {
+    const term = this.searchTerm.trim().toLowerCase();
+    if (term) {
+      this.filteredDecks = this.publicDecks.filter((deck) =>
+        deck.name.toLowerCase().includes(term)
+      );
+    } else {
+      this.filteredDecks = [...this.publicDecks];
+    }
   }
 
   clearFilters(): void {
@@ -156,19 +156,19 @@ export class HomeComponent implements OnInit {
     this.sizeFilter = 'all';
     this.sortBy = 'newest';
     this.minCards = null;
-    this.applyFilters();
+    this.currentPage = 0;
+    this.loadDecks();
   }
 
   onMinCardsChange(value: number | string | null): void {
     if (value === '' || value === null) {
       this.minCards = null;
-      this.applyFilters();
-      return;
+    } else {
+      const normalized = Number(value);
+      this.minCards = Number.isNaN(normalized) ? null : Math.max(0, normalized);
     }
-
-    const normalized = Number(value);
-    this.minCards = Number.isNaN(normalized) ? null : Math.max(0, normalized);
-    this.applyFilters();
+    this.currentPage = 0;
+    this.loadDecks();
   }
 
   sizeFilterLabel(): string {

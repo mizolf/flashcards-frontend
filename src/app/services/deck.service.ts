@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { environment } from '../../environments/environment.development';
 import { CreateDeckRequest, DeckResponse, DeckDetailResponse } from '../models/Deck.dto';
+import { PageResponse, PaginationParams } from '../models/Page.dto';
 
 @Injectable({
   providedIn: 'root'
@@ -13,16 +14,43 @@ export class DeckService {
 
   constructor(private http: HttpClient) {}
 
-  getDecks(): Observable<DeckResponse[]> {
-    return this.http.get<DeckResponse[]>(this.apiUrl);
+  private buildParams(params?: PaginationParams): HttpParams {
+    let httpParams = new HttpParams();
+    if (params?.page !== undefined) {
+      httpParams = httpParams.set('page', params.page.toString());
+    }
+    if (params?.size !== undefined) {
+      httpParams = httpParams.set('size', params.size.toString());
+    }
+    if (params?.sortBy) {
+      httpParams = httpParams.set('sortBy', params.sortBy);
+    }
+    if (params?.sortDir) {
+      httpParams = httpParams.set('sortDir', params.sortDir);
+    }
+    if (params?.sizeFilter) {
+      httpParams = httpParams.set('sizeFilter', params.sizeFilter);
+    }
+    if (params?.minCards !== undefined && params.minCards !== null) {
+      httpParams = httpParams.set('minCards', params.minCards.toString());
+    }
+    return httpParams;
+  }
+
+  getDecks(params?: PaginationParams): Observable<PageResponse<DeckResponse>> {
+    return this.http.get<PageResponse<DeckResponse>>(this.apiUrl, {
+      params: this.buildParams(params)
+    });
   }
 
   getDeckById(id: number): Observable<DeckDetailResponse> {
     return this.http.get<DeckDetailResponse>(`${this.apiUrl}/${id}`);
   }
 
-  getPublicDecks(): Observable<DeckResponse[]> {
-    return this.http.get<DeckResponse[]>(`${this.apiUrl}/public`);
+  getPublicDecks(params?: PaginationParams): Observable<PageResponse<DeckResponse>> {
+    return this.http.get<PageResponse<DeckResponse>>(`${this.apiUrl}/public`, {
+      params: this.buildParams(params)
+    });
   }
 
   createDeck(request: CreateDeckRequest): Observable<DeckResponse> {

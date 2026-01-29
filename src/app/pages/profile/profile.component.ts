@@ -33,12 +33,12 @@ export class ProfileComponent implements OnInit {
     this.loading = true;
     forkJoin({
       isAuthenticated: this.authService.checkAuthStatus(),
-      decks: this.deckService.getDecks()
+      decksPage: this.deckService.getDecks({ page: 0, size: 1000 })
     }).subscribe({
-      next: ({ isAuthenticated, decks }) => {
+      next: ({ isAuthenticated, decksPage }) => {
         this.isAuthenticated = isAuthenticated;
-        this.deckCount = decks.length;
-        this.cardCount = decks.reduce((total, deck) => total + deck.cardCount, 0);
+        this.deckCount = decksPage.totalElements;
+        this.cardCount = decksPage.content.reduce((total, deck) => total + deck.cardCount, 0);
         this.loading = false;
       },
       error: () => {
