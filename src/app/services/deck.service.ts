@@ -34,6 +34,9 @@ export class DeckService {
     if (params?.minCards !== undefined && params.minCards !== null) {
       httpParams = httpParams.set('minCards', params.minCards.toString());
     }
+    if (params?.isPublic !== undefined) {
+      httpParams = httpParams.set('isPublic', params.isPublic.toString());
+    }
     return httpParams;
   }
 

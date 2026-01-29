@@ -15,4 +15,5 @@ export interface PaginationParams {
   sortDir?: 'asc' | 'desc';
   sizeFilter?: 'small' | 'medium' | 'large' | 'empty';
   minCards?: number;
+  isPublic?: boolean;
 }

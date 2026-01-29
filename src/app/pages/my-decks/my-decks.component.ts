@@ -50,6 +50,26 @@ export class MyDecksComponent implements OnInit {
     { value: 'difficulty-high', label: UI_TEXT.myDecks.sortOptions.difficultyHigh },
     { value: 'difficulty-low', label: UI_TEXT.myDecks.sortOptions.difficultyLow }
   ] as const;
+  /** Current visibility filter selection. */
+  visibilityFilter: 'all' | 'public' | 'private' = 'all';
+
+  /** Returns the section title based on the current visibility filter. */
+  get sectionTitle(): string {
+    switch (this.visibilityFilter) {
+      case 'public':
+        return 'Public Decks';
+      case 'private':
+        return 'Private Decks';
+      default:
+        return 'All Decks';
+    }
+  }
+  /** Select options for the visibility dropdown. */
+  visibilityOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'public', label: 'Public' },
+    { value: 'private', label: 'Private' }
+  ] as const;
   /** Current page number (0-indexed). */
   currentPage = 0;
   /** Number of decks per page. */
@@ -65,25 +85,6 @@ export class MyDecksComponent implements OnInit {
     this.loadDecks(true);
   }
 
-  /** Public decks derived from the full list. */
-  get publicDecks(): DeckResponse[] {
-    return this.decks.filter((deck) => deck.isPublic);
-  }
-
-  /** Private decks derived from the full list. */
-  get privateDecks(): DeckResponse[] {
-    return this.decks.filter((deck) => !deck.isPublic);
-  }
-
-  /** Sorted public decks (backend handles sorting). */
-  get sortedPublicDecks(): DeckResponse[] {
-    return this.publicDecks;
-  }
-
-  /** Sorted private decks (backend handles sorting). */
-  get sortedPrivateDecks(): DeckResponse[] {
-    return this.privateDecks;
-  }
 
   /** Opens the create deck dialog. */
   openCreateDialog(): void {
@@ -255,6 +256,14 @@ export class MyDecksComponent implements OnInit {
   }
 
   /**
+   * Handles visibility filter changes and reloads decks.
+   */
+  onVisibilityChange(): void {
+    this.currentPage = 0;
+    this.loadDecks(false);
+  }
+
+  /**
    * Returns backend sort parameters based on current sort option.
    */
   private getSortParams(): Pick<PaginationParams, 'sortBy' | 'sortDir'> {
@@ -286,7 +295,10 @@ export class MyDecksComponent implements OnInit {
     const params: PaginationParams = {
       page: this.currentPage,
       size: this.pageSize,
-      ...this.getSortParams()
+      ...this.getSortParams(),
+      ...(this.visibilityFilter !== 'all' && {
+        isPublic: this.visibilityFilter === 'public'
+      })
     };
 
     this.deckService.getDecks(params).subscribe({

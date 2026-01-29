@@ -201,51 +201,6 @@
   }
 }
 
-.social-buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-}
-
-.social-btn {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  border: 1px solid #e0e0e0;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  i {
-    font-size: 1.25rem;
-  }
-
-  &.google {
-    i {
-      color: #db4437;
-    }
-
-    &:hover {
-      border-color: #db4437;
-      background: #fef5f4;
-    }
-  }
-
-  &.facebook {
-    i {
-      color: #4267B2;
-    }
-
-    &:hover {
-      border-color: #4267B2;
-      background: #f4f6fb;
-    }
-  }
-}
-
 .verification-input {
   text-align: center;
   font-size: 1.5rem;

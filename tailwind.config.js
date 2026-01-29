@@ -25,6 +25,9 @@ module.exports = {
       boxShadow: {
         card: "0 10px 25px -20px rgb(15 23 42 / 0.4)",
         cardHover: "0 20px 40px -25px rgb(15 23 42 / 0.35)"
+      },
+      height: {
+        'deck-card': '12rem',
       }
     }
   },

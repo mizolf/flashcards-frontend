@@ -1,27 +1,79 @@
-# FlashcardsFrontend
+# deckr.
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
+A modern flashcard application for effective learning through spaced repetition.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+- **Browse Public Decks** - Explore and study flashcard decks shared by other users
+- **Create Your Own Decks** - Build custom flashcard decks with public or private visibility
+- **Practice Mode** - Test your knowledge with interactive flashcard sessions
+- **Quick Learn** - Rapid learning mode for efficient study sessions
+- **Difficulty Tracking** - Cards are rated by difficulty to optimize your learning
+- **Pagination & Filtering** - Easily navigate through large collections of decks
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
 
-## Code scaffolding
+## Tech Stack
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **Angular 18** - Modern web framework
+- **PrimeNG 18** - Rich UI component library
+- **Tailwind CSS 3** - Utility-first CSS framework
+- **TypeScript 5.5** - Type-safe JavaScript
+- **RxJS** - Reactive programming
 
-## Build
+## Prerequisites
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Before you begin, ensure you have the following installed:
 
-## Running unit tests
+- [Node.js](https://nodejs.org/) (v18 or higher recommended)
+- npm (comes with Node.js)
+- Angular CLI (optional, for additional commands)
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm install -g @angular/cli
+```
 
-## Running end-to-end tests
+## Installation
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+1. Clone the repository:
 
-## Further help
+```bash
+git clone <repository-url>
+cd flashcards-frontend
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+## Running the Application
+
+Start the development server:
+
+```bash
+npm start
+```
+
+Navigate to `http://localhost:4200/`. The application will automatically reload when you modify source files.
+
+## Available Scripts
+
+| Command         | Description              |
+| --------------- | ------------------------ |
+| `npm start`     | Start development server |
+| `npm run build` | Build for production     |
+| `npm run watch` | Build with watch mode    |
+| `npm test`      | Run unit tests           |
+
+## Backend API
+
+This frontend application requires a backend API server to function. Make sure to clone and run the backend first:
+
+**Backend Repository:** [backend-java-springboot](https://github.com/mizolf/web-backend-springboot)
+
+Follow the backend README instructions to start the server before running this frontend application.
+
+## License
+
+This project is private.
