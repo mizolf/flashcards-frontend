@@ -1,6 +1,30 @@
 <div class="flex h-screen bg-surface text-text">
-  <app-sidebar></app-sidebar>
-  <main class="flex-1 overflow-auto bg-surface p-6">
+  @if (!sidebarService.isOpen()) {
+    <button
+      type="button"
+      class="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg bg-surface-card border border-border shadow-card md:hidden"
+      (click)="sidebarService.toggle()"
+      aria-label="Open navigation menu"
+    >
+      <i class="pi pi-bars"></i>
+    </button>
+  }
+
+  @if (sidebarService.isOpen()) {
+    <div
+      class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm md:hidden"
+      (click)="onOverlayClick()"
+      aria-hidden="true"
+    ></div>
+  }
+
+  <app-sidebar
+    class="fixed z-40 h-screen transition-transform duration-300 ease-in-out md:relative md:translate-x-0"
+    [class.-translate-x-full]="!sidebarService.isOpen()"
+    [class.translate-x-0]="sidebarService.isOpen()"
+  ></app-sidebar>
+
+  <main class="flex-1 overflow-auto bg-surface p-4 pt-16 md:p-6 md:pt-6">
     <router-outlet></router-outlet>
   </main>
 </div>

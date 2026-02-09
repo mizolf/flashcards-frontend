@@ -1,6 +1,14 @@
 <aside class="h-screen w-64 bg-surface-card text-text flex flex-col border-r border-border">
-  <div class="p-4 border-b border-border">
+  <div class="p-4 border-b border-border flex items-center justify-between">
     <h1 class="text-xl font-semibold text-text">deckr.</h1>
+    <button
+      type="button"
+      class="flex h-8 w-8 items-center justify-center rounded-lg text-text-muted hover:bg-surface-soft transition-colors md:hidden"
+      (click)="closeSidebar()"
+      aria-label="Close menu"
+    >
+      <i class="pi pi-times"></i>
+    </button>
   </div>
 
   <nav class="flex-1 p-4">

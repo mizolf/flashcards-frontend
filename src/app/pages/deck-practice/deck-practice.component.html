@@ -1,4 +1,4 @@
-<section class="mx-auto w-full max-w-4xl px-4 py-10 text-text" *ngIf="!initialLoading">
+<section class="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 sm:py-10 text-text" *ngIf="!initialLoading">
   <div class="flex flex-wrap items-center justify-between gap-4">
     <div>
       <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.deckPractice.practiceLabel }}</p>
@@ -17,7 +17,7 @@
     </button>
   </div>
 
-  <div class="mt-6 flex flex-wrap items-center gap-3">
+  <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
     <button
       class="btn-ghost px-3 py-2 text-xs uppercase tracking-[0.2em]"
       type="button"
@@ -32,36 +32,38 @@
     >
       {{ text.deckPractice.shuffle }}
     </button>
-    <div
-      class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2"
-      *ngIf="availableTags.length > 0"
-    >
-      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.tagLabel }}</span>
-      <select
-        class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
-        [(ngModel)]="selectedTag"
-        (ngModelChange)="onFiltersChange()"
-        [attr.aria-label]="text.deckPractice.tagAriaLabel"
+    <div class="flex flex-wrap items-center gap-3">
+      <div
+        class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2"
+        *ngIf="availableTags.length > 0"
       >
-        <option [ngValue]="null">{{ text.deckPractice.allTags }}</option>
-        <option *ngFor="let tag of availableTags" [ngValue]="tag">
-          {{ tag }}
-        </option>
-      </select>
-    </div>
-    <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
-      <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.difficultyLabel }}</span>
-      <select
-        class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
-        [(ngModel)]="selectedDifficulty"
-        (ngModelChange)="onFiltersChange()"
-        [attr.aria-label]="text.deckPractice.difficultyAriaLabel"
-      >
-        <option [ngValue]="null">{{ text.deckPractice.difficultyAll }}</option>
-        <option [ngValue]="1">{{ text.deckPractice.difficultyLow }}</option>
-        <option [ngValue]="2">{{ text.deckPractice.difficultyMedium }}</option>
-        <option [ngValue]="3">{{ text.deckPractice.difficultyHard }}</option>
-      </select>
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.tagLabel }}</span>
+        <select
+          class="flex-1 min-w-0 bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [(ngModel)]="selectedTag"
+          (ngModelChange)="onFiltersChange()"
+          [attr.aria-label]="text.deckPractice.tagAriaLabel"
+        >
+          <option [ngValue]="null">{{ text.deckPractice.allTags }}</option>
+          <option *ngFor="let tag of availableTags" [ngValue]="tag">
+            {{ tag }}
+          </option>
+        </select>
+      </div>
+      <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
+        <span class="text-xs font-semibold uppercase tracking-[0.2em] text-text-muted leading-none">{{ text.deckPractice.difficultyLabel }}</span>
+        <select
+          class="flex-1 min-w-0 bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          [(ngModel)]="selectedDifficulty"
+          (ngModelChange)="onFiltersChange()"
+          [attr.aria-label]="text.deckPractice.difficultyAriaLabel"
+        >
+          <option [ngValue]="null">{{ text.deckPractice.difficultyAll }}</option>
+          <option [ngValue]="1">{{ text.deckPractice.difficultyLow }}</option>
+          <option [ngValue]="2">{{ text.deckPractice.difficultyMedium }}</option>
+          <option [ngValue]="3">{{ text.deckPractice.difficultyHard }}</option>
+        </select>
+      </div>
     </div>
     <span class="text-xs text-text-muted">{{ displayCards.length }} / {{ cards.length }} {{ text.deckPractice.countLabel }}</span>
   </div>

@@ -77,6 +77,22 @@ body {
     color: rgb(var(--text));
     border: 1px solid rgb(var(--border));
     border-radius: 1rem;
+    width: 90vw !important;
+    max-width: 500px;
+    margin: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .p-dialog {
+      width: 450px !important;
+      margin: 0;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .p-dialog {
+      width: 500px !important;
+    }
   }
 
   .p-dialog .p-dialog-header,
@@ -89,10 +105,24 @@ body {
 
   .p-dialog .p-dialog-header {
     border-bottom: 1px solid rgb(var(--border));
+    padding: 1rem;
+  }
+
+  .p-dialog .p-dialog-content {
+    padding: 1rem;
   }
 
   .p-dialog .p-dialog-footer {
     border-top: 1px solid rgb(var(--border));
+    padding: 0.75rem 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .p-dialog .p-dialog-header,
+    .p-dialog .p-dialog-content,
+    .p-dialog .p-dialog-footer {
+      padding: 1.25rem;
+    }
   }
 
   .p-dialog .p-dialog-header-icon {

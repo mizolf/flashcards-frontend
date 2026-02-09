@@ -1,4 +1,4 @@
-<section class="mx-auto w-full max-w-6xl px-4 py-8 text-text">
+<section class="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8 text-text">
   <div class="flex flex-wrap items-center justify-between gap-4">
     <div>
       <p class="text-xs uppercase tracking-[0.3em] text-text-muted">{{ text.myDecks.workspaceLabel }}</p>
@@ -15,11 +15,11 @@
   </div>
 
   <div class="mt-8 space-y-10" *ngIf="!initialLoading">
-    <div class="flex items-center gap-2">
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
       <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
         <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">VISIBILITY</span>
         <select
-          class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          class="flex-1 min-w-0 bg-transparent text-xs font-semibold text-text outline-none leading-none"
           [(ngModel)]="visibilityFilter"
           (ngModelChange)="onVisibilityChange()"
           aria-label="Filter by visibility"
@@ -33,7 +33,7 @@
       <div class="flex items-baseline gap-2 rounded-full border border-border-subtle bg-surface-card px-3 py-2">
         <span class="text-xs font-semibold uppercase tracking-[0.25em] text-text-muted leading-none">{{ text.myDecks.sortLabel }}</span>
         <select
-          class="bg-transparent text-xs font-semibold text-text outline-none leading-none"
+          class="flex-1 min-w-0 bg-transparent text-xs font-semibold text-text outline-none leading-none"
           [(ngModel)]="sortOption"
           (ngModelChange)="onSortChange()"
           [attr.aria-label]="text.myDecks.sortAriaLabel"
