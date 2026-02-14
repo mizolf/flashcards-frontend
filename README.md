@@ -4,6 +4,7 @@ A modern flashcard application for effective learning through spaced repetition.
 
 ## Features
 
+- **AI-Powered Card Generation** - Automatically generate flashcards from text or PDF documents using Google Gemini AI
 - **Browse Public Decks** - Explore and study flashcard decks shared by other users
 - **Create Your Own Decks** - Build custom flashcard decks with public or private visibility
 - **Practice Mode** - Test your knowledge with interactive flashcard sessions
