@@ -60,7 +60,51 @@ export const UI_TEXT = {
     deleteCardTitle: 'Delete card?',
     deleteCardConfirmPrefix: 'Are you sure you want to delete "',
     deleteCardConfirmSuffix: '"?',
-    cancel: 'Cancel'
+    cancel: 'Cancel',
+    aiGenerate: 'AI Generate'
+  },
+  aiGenerateDialog: {
+    title: 'Generate Cards with AI',
+    tabText: 'From Text',
+    tabPdf: 'From PDF',
+    textPlaceholder: 'Paste your study material here (10-50,000 characters)...',
+    charCount: 'characters',
+    minChars: 'Minimum 10 characters required',
+    maxChars: 'Maximum 50,000 characters',
+    dropPdfHere: 'Drop PDF here or click to browse',
+    selectedFile: 'Selected:',
+    maxFileSize: 'Maximum file size: 10MB',
+    invalidFileType: 'Only PDF files are allowed',
+    fileTooLarge: 'File exceeds 10MB limit',
+    generate: 'Generate Cards',
+    generating: 'Generating cards...',
+    generatingHint: 'This may take up to 10 seconds',
+    previewTitle: 'Generated Cards',
+    selectAll: 'Select all',
+    deselectAll: 'Deselect all',
+    selected: 'selected',
+    saveSelected: 'Save Selected',
+    saving: 'Saving...',
+    back: 'Back',
+    cancel: 'Cancel',
+    questionLabel: 'Question',
+    answerLabel: 'Answer',
+    tagLabel: 'Tag',
+    difficultyLabel: 'Difficulty',
+    difficultyOptions: {
+      low: 'Low',
+      medium: 'Medium',
+      hard: 'Hard'
+    },
+    noCardsGenerated: 'No cards were generated. Try different content.',
+    errors: {
+      invalidInput: 'Invalid input. Please check your text or file.',
+      forbidden: 'You do not have permission to generate cards for this deck.',
+      notFound: 'Deck not found.',
+      fileTooLarge: 'File is too large. Maximum size is 10MB.',
+      generic: 'An error occurred. Please try again.'
+    },
+    successSuffix: 'cards saved successfully!'
   },
   deckPractice: {
     practiceLabel: 'Practice',

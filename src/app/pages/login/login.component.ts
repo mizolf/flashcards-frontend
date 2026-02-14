@@ -37,8 +37,8 @@ export class LoginComponent {
   verificationEmail: string = '';
 
   modeOptions = [
-    { label: 'Registracija', value: 'register' },
-    { label: 'Prijava', value: 'login' }
+    { label: 'Register', value: 'register' },
+    { label: 'Login', value: 'login' }
   ];
   selectedMode: string = 'login';
 

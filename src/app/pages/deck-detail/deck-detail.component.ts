@@ -12,6 +12,7 @@ import { CardService } from '../../services/card.service';
 import { DeckService } from '../../services/deck.service';
 import { CardFormDialogComponent } from '../../shared/card-form-dialog/card-form-dialog.component';
 import { UI_TEXT } from '../../constants/ui-text';
+import { AiGenerateDialogComponent } from '../../shared/ai-generate-dialog/ai-generate-dialog.component';
 
 @Component({
   selector: 'app-deck-detail',
@@ -23,7 +24,8 @@ import { UI_TEXT } from '../../constants/ui-text';
     RouterModule,
     CheckboxModule,
     InputTextModule,
-    CardFormDialogComponent
+    CardFormDialogComponent,
+    AiGenerateDialogComponent
   ],
   templateUrl: './deck-detail.component.html',
   styleUrl: './deck-detail.component.scss'
@@ -62,6 +64,8 @@ export class DeckDetailComponent implements OnInit {
   /** Currently selected tag filter. */
   selectedTag: string | null = null;
 
+  showAiGenerateDialog = false;
+
   /** Provides routing and deck/card services for the detail view. */
   constructor(
     private route: ActivatedRoute,
@@ -73,6 +77,15 @@ export class DeckDetailComponent implements OnInit {
   /** Loads the deck on first render. */
   ngOnInit(): void {
     this.loadDeck(true);
+  }
+
+  openAiGenerateDialog(): void { 
+    this.showAiGenerateDialog = true; 
+  }
+  
+  onAiCardsGenerated(count: number): void {
+    this.showAiGenerateDialog = false;
+    this.loadDeck(false);
   }
 
   /**

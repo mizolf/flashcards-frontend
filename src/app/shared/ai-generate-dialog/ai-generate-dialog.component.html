@@ -1,0 +1,243 @@
+<p-dialog
+  [header]="text.aiGenerateDialog.title"
+  [(visible)]="visible"
+  [modal]="true"
+  [closable]="step === 'input' || step === 'preview'"
+  [style]="{ width: '90vw', maxWidth: '900px' }"
+  (onHide)="close()"
+>
+  <!-- Error Message -->
+  <div
+    class="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700"
+    *ngIf="errorMessage"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <!-- Step 1: Input -->
+  <ng-container *ngIf="step === 'input'">
+    <!-- Mode Toggle -->
+    <div class="mb-4 flex gap-2">
+      <button
+        class="btn-ghost px-4 py-2 text-sm"
+        type="button"
+        [ngClass]="{ 'bg-surface-soft text-text': inputMode === 'text' }"
+        (click)="setInputMode('text')"
+      >
+        {{ text.aiGenerateDialog.tabText }}
+      </button>
+      <button
+        class="btn-ghost px-4 py-2 text-sm"
+        type="button"
+        [ngClass]="{ 'bg-surface-soft text-text': inputMode === 'pdf' }"
+        (click)="setInputMode('pdf')"
+      >
+        {{ text.aiGenerateDialog.tabPdf }}
+      </button>
+    </div>
+
+    <!-- Text Input Mode -->
+    <div *ngIf="inputMode === 'text'" class="flex flex-col gap-2">
+      <textarea
+        pInputTextarea
+        [(ngModel)]="textContent"
+        [placeholder]="text.aiGenerateDialog.textPlaceholder"
+        rows="10"
+        class="w-full resize-none"
+      ></textarea>
+      <div class="flex items-center justify-between text-xs text-text-muted">
+        <span>{{ textLength }} / {{ MAX_TEXT_LENGTH }} {{ text.aiGenerateDialog.charCount }}</span>
+        <span *ngIf="textLength > 0 && textLength < MIN_TEXT_LENGTH" class="text-amber-600">
+          {{ text.aiGenerateDialog.minChars }}
+        </span>
+      </div>
+    </div>
+
+    <!-- PDF Input Mode -->
+    <div *ngIf="inputMode === 'pdf'" class="flex flex-col gap-3">
+      <input
+        type="file"
+        accept="application/pdf"
+        (change)="onFileSelected($event)"
+        #fileInput
+        class="hidden"
+      />
+
+      <!-- Drop Zone -->
+      <div
+        class="flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-border-subtle bg-surface-soft p-8 text-center transition hover:border-accent hover:bg-surface"
+        (click)="fileInput.click()"
+        (dragover)="onDragOver($event)"
+        (drop)="onFileDrop($event)"
+        *ngIf="!selectedFile"
+      >
+        <i class="pi pi-file-pdf mb-2 text-3xl text-text-muted"></i>
+        <span class="text-sm text-text-muted">{{ text.aiGenerateDialog.dropPdfHere }}</span>
+        <span class="mt-1 text-xs text-text-muted">{{ text.aiGenerateDialog.maxFileSize }}</span>
+      </div>
+
+      <!-- Selected File -->
+      <div
+        class="flex items-center justify-between rounded-lg border border-border bg-surface-card p-4"
+        *ngIf="selectedFile"
+      >
+        <div class="flex items-center gap-3">
+          <i class="pi pi-file-pdf text-2xl text-rose-500"></i>
+          <div>
+            <span class="text-sm font-medium text-text">{{ selectedFile.name }}</span>
+            <span class="ml-2 text-xs text-text-muted">
+              ({{ (selectedFile.size / 1024 / 1024).toFixed(2) }} MB)
+            </span>
+          </div>
+        </div>
+        <button
+          class="btn-ghost p-2 text-text-muted hover:text-rose-600"
+          type="button"
+          (click)="clearFile()"
+        >
+          <i class="pi pi-times"></i>
+        </button>
+      </div>
+
+      <!-- File Error -->
+      <div class="text-sm text-rose-600" *ngIf="fileError">
+        {{ fileError }}
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Step 2: Generating -->
+  <div class="flex flex-col items-center justify-center py-12" *ngIf="step === 'generating'">
+    <div class="app-loading-spinner mb-4"></div>
+    <span class="text-lg font-medium text-text">{{ text.aiGenerateDialog.generating }}</span>
+    <span class="mt-1 text-sm text-text-muted">{{ text.aiGenerateDialog.generatingHint }}</span>
+  </div>
+
+  <!-- Step 3: Preview -->
+  <ng-container *ngIf="step === 'preview'">
+    <div class="mb-4 flex items-center justify-between">
+      <h3 class="text-lg font-semibold text-text">
+        {{ text.aiGenerateDialog.previewTitle }} ({{ generatedCards.length }})
+      </h3>
+      <button
+        class="btn-ghost px-3 py-1 text-sm"
+        type="button"
+        (click)="toggleSelectAll()"
+      >
+        {{ allSelected ? text.aiGenerateDialog.deselectAll : text.aiGenerateDialog.selectAll }}
+      </button>
+    </div>
+
+    <div class="max-h-96 space-y-4 overflow-y-auto pr-2">
+      <div
+        class="rounded-lg border border-border bg-surface-card p-4"
+        *ngFor="let card of generatedCards; let i = index"
+      >
+        <div class="mb-3 flex items-start gap-3">
+          <p-checkbox
+            [(ngModel)]="card.selected"
+            [binary]="true"
+            [inputId]="'card-' + i"
+          ></p-checkbox>
+          <div class="flex-1">
+            <!-- Question -->
+            <div class="mb-3">
+              <label [for]="'question-' + i" class="mb-1 block text-xs font-medium text-text-muted">
+                {{ text.aiGenerateDialog.questionLabel }}
+              </label>
+              <textarea
+                pInputTextarea
+                [(ngModel)]="card.question"
+                [id]="'question-' + i"
+                [autoResize]="true"
+                rows="1"
+                class="w-full text-sm"
+              ></textarea>
+            </div>
+
+            <!-- Answer -->
+            <div class="mb-3">
+              <label [for]="'answer-' + i" class="mb-1 block text-xs font-medium text-text-muted">
+                {{ text.aiGenerateDialog.answerLabel }}
+              </label>
+              <textarea
+                pInputTextarea
+                [(ngModel)]="card.answer"
+                [id]="'answer-' + i"
+                [autoResize]="true"
+                rows="1"
+                class="w-full text-sm"
+              ></textarea>
+            </div>
+
+            <!-- Tag and Difficulty -->
+            <div class="flex flex-wrap gap-3">
+              <div class="flex-1">
+                <label [for]="'tag-' + i" class="mb-1 block text-xs font-medium text-text-muted">
+                  {{ text.aiGenerateDialog.tagLabel }}
+                </label>
+                <input
+                  pInputText
+                  [(ngModel)]="card.tag"
+                  [id]="'tag-' + i"
+                  class="w-full text-sm"
+                />
+              </div>
+              <div class="w-32">
+                <label [for]="'difficulty-' + i" class="mb-1 block text-xs font-medium text-text-muted">
+                  {{ text.aiGenerateDialog.difficultyLabel }}
+                </label>
+                <select
+                  [(ngModel)]="card.difficulty"
+                  [id]="'difficulty-' + i"
+                  class="w-full rounded-md border border-border bg-surface-card px-3 py-2 text-sm text-text"
+                >
+                  <option *ngFor="let opt of difficultyOptions" [ngValue]="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Step 4: Saving -->
+  <div class="flex flex-col items-center justify-center py-12" *ngIf="step === 'saving'">
+    <div class="app-loading-spinner mb-4"></div>
+    <span class="text-lg font-medium text-text">{{ text.aiGenerateDialog.saving }}</span>
+  </div>
+
+  <!-- Footer -->
+  <ng-template pTemplate="footer">
+    <!-- Input Step Footer -->
+    <ng-container *ngIf="step === 'input'">
+      <button class="btn-ghost" type="button" (click)="close()">
+        {{ text.aiGenerateDialog.cancel }}
+      </button>
+      <button
+        pButton
+        type="button"
+        [label]="text.aiGenerateDialog.generate"
+        [disabled]="!canGenerate"
+        (click)="generate()"
+      ></button>
+    </ng-container>
+
+    <!-- Preview Step Footer -->
+    <ng-container *ngIf="step === 'preview'">
+      <button class="btn-ghost" type="button" (click)="goBack()">
+        {{ text.aiGenerateDialog.back }}
+      </button>
+      <button
+        pButton
+        type="button"
+        [label]="text.aiGenerateDialog.saveSelected + ' (' + selectedCount + ')'"
+        [disabled]="selectedCount === 0"
+        (click)="saveSelected()"
+      ></button>
+    </ng-container>
+  </ng-template>
+</p-dialog>

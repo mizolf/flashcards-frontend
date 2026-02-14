@@ -14,13 +14,23 @@
         {{ deck.cardCount }} {{ text.deckDetail.cardsLabel }} | {{ deck.ownerUsername }}
       </p>
     </div>
-    <button
-      pButton
-      type="button"
-      [label]="text.deckDetail.newCard"
-      icon="pi pi-plus"
-      (click)="openCardDialog()"
-    ></button>
+    <div class="flex flex-wrap items-center gap-2">
+      <button
+        pButton
+        type="button"
+        [label]="text.deckDetail.newCard"
+        icon="pi pi-plus"
+        (click)="openCardDialog()"
+      ></button>
+      <button
+        pButton
+        type="button"
+        class="p-button-secondary"
+        [label]="text.deckDetail.aiGenerate"
+        icon="pi pi-sparkles"
+        (click)="openAiGenerateDialog()"
+      ></button>
+    </div>
   </div>
 
   <div class="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1.95fr]">
@@ -163,3 +173,9 @@
     </div>
   </div>
 </div>
+
+<app-ai-generate-dialog
+  [(visible)]="showAiGenerateDialog"
+  [deckId]="deck?.id ?? null"
+  (cardsGenerated)="onAiCardsGenerated($event)"
+></app-ai-generate-dialog>

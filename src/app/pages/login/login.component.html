@@ -1,10 +1,10 @@
 <div class="login-container">
   <div class="login-card">
     @if (isLoginMode) {
-      <h1 class="title">Prijavite se na vaš račun</h1>
+      <h1 class="title">Sign in to your account</h1>
     }
     @else {
-      <h1 class="title">Stvorite novi račun</h1>
+      <h1 class="title">Create a new account</h1>
     }
 
     <div class="flex justify-center items-center w-full mb-4">
@@ -17,33 +17,33 @@
         aria-labelledby="mode-selector" />
     </div>
 
-    <!-- Login forma -->
+    <!-- Login form -->
     @if (isLoginMode && !showVerification) {
         <form [formGroup]="loginForm" class="form" >
           <div class="field">
-            <label for="login-email">E-mail adresa</label>
+            <label for="login-email">Email address</label>
             <input
             pInputText
             id="login-email"
             type="email"
-            placeholder="Unesite vašu e-mail adresu"
+            placeholder="Enter your email address"
             class="input-field"
             formControlName="email" />
           </div>
-          
+
           @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
-            <small class="error">Unesite valjanu e-mail adresu</small>
+            <small class="error">Please enter a valid email address</small>
           }
-          
+
           <div class="field">
-            <label for="login-password">Lozinka</label>
-            <p-password formControlName="password" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Unesite vašu lozinku" />
+            <label for="login-password">Password</label>
+            <p-password formControlName="password" feedback="false" [toggleMask]="true" styleClass="password-input" placeholder="Enter your password" />
           </div>
-        
+
           <button
             pButton
             type="submit"
-            label="Prijavi se"
+            label="Sign in"
             class="submit-btn"
             [loading]="loading"
             [disabled]="loginForm.invalid"
@@ -52,52 +52,52 @@
         </form>
     }
 
-    <!-- Register forma -->
+    <!-- Register form -->
     @if (!isLoginMode && !showVerification) {
         <form [formGroup]="registerForm" class="form" >
           <div class="field">
-            <label for="register-username">Korisničko ime</label>
+            <label for="register-username">Username</label>
             <input
               pInputText
               id="register-username"
               type="text"
-              placeholder="Unesite korisničko ime"
+              placeholder="Enter your username"
               class="input-field"
               formControlName="username" />
           </div>
-    
+
           <div class="field">
-            <label for="register-email">E-mail adresa</label>
+            <label for="register-email">Email address</label>
             <input
               pInputText
               id="register-email"
               type="email"
-              placeholder="Unesite vašu e-mail adresu"
+              placeholder="Enter your email address"
               class="input-field"
               formControlName="email" />
           </div>
-    
+
           <div class="field">
-            <label for="register-password">Lozinka</label>
-            <p-password formControlName="password" feedback="false" [toggleMask]="true" placeholder="Unesite vašu lozinku" styleClass="password-input" />
+            <label for="register-password">Password</label>
+            <p-password formControlName="password" feedback="false" [toggleMask]="true" placeholder="Enter your password" styleClass="password-input" />
           </div>
-    
+
           <div class="field">
-            <label for="confirm-password">Potvrdite lozinku</label>
+            <label for="confirm-password">Confirm password</label>
             <p-password
               id="confirm-password"
-              placeholder="Potvrdite vašu lozinku"
+              placeholder="Confirm your password"
               [toggleMask]="true"
               [feedback]="false"
               styleClass="password-input"
               formControlName="confirmPassword">
             </p-password>
           </div>
-    
+
           <button
             pButton
             type="submit"
-            label="Registriraj se"
+            label="Register"
             class="submit-btn"
             [loading]="loading"
             [disabled]="registerForm.invalid"
@@ -106,22 +106,22 @@
         </form>
     }
 
-    <p-dialog 
-      header="Verifikacija e-maila" 
-      [(visible)]="showVerification" 
+    <p-dialog
+      header="Email verification"
+      [(visible)]="showVerification"
       [modal]="true"
       [closable]="true"
       [style]="{ width: '90vw', maxWidth: '400px' }">
-      
-      <p class="mb-4">Poslali smo verifikacijski kod na {{ verificationEmail }}</p>
-      
+
+      <p class="mb-4">We sent a verification code to {{ verificationEmail }}</p>
+
       <div class="field">
-        <label for="verification-code">Verifikacijski kod</label>
+        <label for="verification-code">Verification code</label>
         <input
           pInputText
           id="verification-code"
           type="text"
-          placeholder="Unesite 6-cifreni kod"
+          placeholder="Enter 6-digit code"
           class="input-field"
           [(ngModel)]="verificationCode"
           maxlength="6" />
@@ -130,7 +130,7 @@
       <button
         pButton
         type="button"
-        label="Potvrdi"
+        label="Verify"
         class="submit-btn"
         [disabled]="verificationCode.length !== 6"
         (click)="verify()">
@@ -138,8 +138,8 @@
 
       <div class="text-center mt-3">
         <p class="resend-text">
-          Niste primili kod?
-          <a (click)="resendCode()" class="resend-link cursor-pointer">Pošalji ponovo</a>
+          Didn't receive the code?
+          <a (click)="resendCode()" class="resend-link cursor-pointer">Resend</a>
         </p>
       </div>
     </p-dialog>
